@@ -111,9 +111,27 @@ cat << EOT > /etc/apt/sources.list
 deb http://archive.ubuntu.com/ubuntu $UBUNTU_RELEASE main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu $UBUNTU_RELEASE-updates main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu $UBUNTU_RELEASE-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu $UBUNTU_RELEASE-backports main restricted universe multiverse
 EOT
 
 # Adicionar repositórios de terceiros
+
+# ===== KERNEL E DRIVERS =====
+
+# Kernel Mainline (kernels mais recentes)
+apt-add-repository -y ppa:cappelikan/ppa
+
+# Graphics Drivers PPA (NVIDIA, AMD, Intel drivers atualizados)
+apt-add-repository -y ppa:graphics-drivers/ppa
+
+# OEM Kernel (otimizado para hardware mais recente)
+# Disponível nos repositórios padrão
+
+# Intel Graphics (repositório oficial Intel)
+wget -qO- https://repositories.intel.com/gpu/intel-graphics.key | gpg --dearmor -o /usr/share/keyrings/intel-graphics.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu $UBUNTU_RELEASE client" > /etc/apt/sources.list.d/intel-graphics.list
+
+# ===== NAVEGADORES =====
 
 # Google Chrome
 wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg
@@ -123,9 +141,64 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] h
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-edge-keyring.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge-keyring.gpg] https://packages.microsoft.com/repos/edge stable main" > /etc/apt/sources.list.d/microsoft-edge.list
 
+# ===== FERRAMENTAS DE DESENVOLVIMENTO =====
+
+# Visual Studio Code
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/packages.microsoft.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list
+
+# Docker (containerização)
+wget -qO- https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $UBUNTU_RELEASE stable" > /etc/apt/sources.list.d/docker.list
+
+# Git (versão mais recente)
+apt-add-repository -y ppa:git-core/ppa
+
+# .NET SDK (Microsoft)
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-dotnet.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-dotnet.gpg] https://packages.microsoft.com/ubuntu/$UBUNTU_RELEASE/prod $UBUNTU_RELEASE main" > /etc/apt/sources.list.d/dotnet.list
+
+# NodeJS (via NodeSource)
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /usr/share/keyrings/nodesource.gpg
+echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" > /etc/apt/sources.list.d/nodesource.list
+
+# Yarn (gerenciador de pacotes JavaScript)
+wget -qO- https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/yarn.gpg
+echo "deb [signed-by=/usr/share/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
+
+# PostgreSQL (banco de dados)
+wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql.gpg
+echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $UBUNTU_RELEASE-pgdg main" > /etc/apt/sources.list.d/postgresql.list
+
+# ===== MULTIMÍDIA =====
+
 # Spotify
 curl -sS https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg | gpg --dearmor -o /usr/share/keyrings/spotify-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/spotify-keyring.gpg] http://repository.spotify.com stable non-free" > /etc/apt/sources.list.d/spotify.list
+
+# OBS Studio
+apt-add-repository -y ppa:obsproject/obs-studio
+
+# ===== COMUNICAÇÃO E COLABORAÇÃO =====
+
+# Microsoft Teams
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/teams.gpg
+echo "deb [signed-by=/usr/share/keyrings/teams.gpg arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main" > /etc/apt/sources.list.d/teams.list
+
+# Zoom
+wget -qO /tmp/zoom_pubkey.gpg https://zoom.us/linux/download/pubkey
+gpg --dearmor -o /usr/share/keyrings/zoom.gpg < /tmp/zoom_pubkey.gpg
+echo "deb [signed-by=/usr/share/keyrings/zoom.gpg] https://zoom.us/linux/deb/ stable main" > /etc/apt/sources.list.d/zoom.list
+
+# ===== FERRAMENTAS GIT/DEVOPS =====
+
+# GitHub CLI (gh)
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
+
+# GitLab Runner (opcional - para CI/CD)
+curl -fsSL https://packages.gitlab.com/runner/gitlab-runner/gpgkey | gpg --dearmor -o /usr/share/keyrings/gitlab-runner.gpg
+echo "deb [signed-by=/usr/share/keyrings/gitlab-runner.gpg] https://packages.gitlab.com/runner/gitlab-runner/ubuntu/ $UBUNTU_RELEASE main" > /etc/apt/sources.list.d/gitlab-runner.list
 
 # Steam (repositório multiverse já está habilitado)
 dpkg --add-architecture i386
@@ -135,6 +208,7 @@ apt update
 # PACOTES BÁSICOS - customize aqui
 DEBIAN_FRONTEND=noninteractive apt install -y \
     linux-generic \
+    linux-generic-hwe-$(lsb_release -rs | cut -d. -f1).$(lsb_release -rs | cut -d. -f2) \
     systemd-sysv \
     sudo \
     vim \
@@ -154,30 +228,145 @@ DEBIAN_FRONTEND=noninteractive apt install -y \
     firefox \
     zsh \
     vlc \
-    gparted
+    gparted \
+    software-properties-common \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    lsb-release
 
-# PACOTES DE TERCEIROS (descomente os que desejar)
+# DRIVERS DE HARDWARE (descomente conforme necessário)
+# NVIDIA Drivers (detecta automaticamente a GPU)
+# DEBIAN_FRONTEND=noninteractive apt install -y nvidia-driver-535 nvidia-utils-535
+
+# AMD Drivers (já incluídos no kernel, mas pode instalar mesa atualizado)
+# DEBIAN_FRONTEND=noninteractive apt install -y mesa-vulkan-drivers mesa-vdpau-drivers
+
+# Intel Graphics (drivers e ferramentas)
+# DEBIAN_FRONTEND=noninteractive apt install -y intel-gpu-tools intel-media-va-driver
+
+# Kernel Mainline Manager
+# DEBIAN_FRONTEND=noninteractive apt install -y mainline
+
+# FERRAMENTAS DE DESENVOLVIMENTO (descomente as que desejar)
+
+# Visual Studio Code
+# DEBIAN_FRONTEND=noninteractive apt install -y code
+
+# Git (versão mais recente)
+# DEBIAN_FRONTEND=noninteractive apt install -y git git-lfs
+
+# Docker
+# DEBIAN_FRONTEND=noninteractive apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Java (OpenJDK)
+# DEBIAN_FRONTEND=noninteractive apt install -y openjdk-17-jdk openjdk-17-jre maven gradle
+
+# Oracle Java (requer aceitar licença manualmente, use OpenJDK acima como alternativa)
+# echo "oracle-java17-installer shared/accepted-oracle-license-v1-3 select true" | debconf-set-selections
+# DEBIAN_FRONTEND=noninteractive apt install -y oracle-java17-installer oracle-java17-set-default
+
+# .NET SDK
+# DEBIAN_FRONTEND=noninteractive apt install -y dotnet-sdk-8.0
+
+# Node.js e NPM
+# DEBIAN_FRONTEND=noninteractive apt install -y nodejs
+
+# Yarn
+# DEBIAN_FRONTEND=noninteractive apt install -y yarn
+
+# Python (desenvolvimento)
+# DEBIAN_FRONTEND=noninteractive apt install -y python3-pip python3-venv python3-dev build-essential
+
+# Go
+# DEBIAN_FRONTEND=noninteractive apt install -y golang-go
+
+# Ruby e Rails
+# DEBIAN_FRONTEND=noninteractive apt install -y ruby-full bundler
+
+# Rust
+# curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+# PostgreSQL
+# DEBIAN_FRONTEND=noninteractive apt install -y postgresql postgresql-contrib
+
+# MySQL
+# DEBIAN_FRONTEND=noninteractive apt install -y mysql-server
+
+# MongoDB (requer repositório adicional)
+# DEBIAN_FRONTEND=noninteractive apt install -y mongodb-org
+
+# Redis
+# DEBIAN_FRONTEND=noninteractive apt install -y redis-server
+
+# JETBRAINS TOOLBOX (instalador para IntelliJ IDEA, PyCharm, etc)
+# wget -O /tmp/jetbrains-toolbox.tar.gz "https://download.jetbrains.com/toolbox/jetbrains-toolbox-latest.tar.gz"
+# tar -xzf /tmp/jetbrains-toolbox.tar.gz -C /opt/
+# chmod +x /opt/jetbrains-toolbox-*/jetbrains-toolbox
+
+# NAVEGADORES (descomente os que desejar)
 # Google Chrome
 # DEBIAN_FRONTEND=noninteractive apt install -y google-chrome-stable
 
 # Microsoft Edge
 # DEBIAN_FRONTEND=noninteractive apt install -y microsoft-edge-stable
 
+# MULTIMÍDIA
 # Spotify
 # DEBIAN_FRONTEND=noninteractive apt install -y spotify-client
+
+# OBS Studio
+# DEBIAN_FRONTEND=noninteractive apt install -y obs-studio
 
 # Steam (requer aceitar EULA)
 # echo steam steam/question select "I AGREE" | debconf-set-selections
 # echo steam steam/license note '' | debconf-set-selections
 # DEBIAN_FRONTEND=noninteractive apt install -y steam-installer
 
+# FERRAMENTAS EXTRAS
+# Postman (API testing)
+# snap install postman
+
+# DBeaver (GUI para bancos de dados)
+# snap install dbeaver-ce
+
+# Insomnia (REST client)
+# snap install insomnia
+
+# ==========================================
+# CONFIGURAÇÃO DE USUÁRIO E SUDO
+# ==========================================
+
 # Usuário padrão
 USERNAME="$USERNAME"
 PASSWORD="$PASSWORD"
 
+# Criar usuário
 useradd -m -s /bin/bash "\$USERNAME"
 echo "\$USERNAME:\$PASSWORD" | chpasswd
 usermod -aG sudo "\$USERNAME"
+
+# ==========================================
+# CONFIGURAÇÃO DO SUDO (personalize aqui)
+# ==========================================
+
+# OPÇÃO 1: Sudo SEM senha (recomendado para uso pessoal/desenvolvimento)
+# Descomente a linha abaixo para permitir sudo sem senha
+echo "\$USERNAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/\$USERNAME
+
+# OPÇÃO 2: Sudo COM senha mas com timeout maior (padrão é 15 minutos)
+# Descomente para aumentar timeout para 60 minutos
+# echo "Defaults timestamp_timeout=60" >> /etc/sudoers.d/sudo-timeout
+
+# OPÇÃO 3: Sudo com senha e timeout padrão (15 minutos)
+# Se deseja manter comportamento padrão, comente a OPÇÃO 1 acima
+
+# OPÇÃO 4: Desabilitar completamente a necessidade de senha de root
+# Útil para ambientes de desenvolvimento
+# passwd -d root
+
+# Garantir permissões corretas no arquivo sudoers
+chmod 0440 /etc/sudoers.d/\$USERNAME
 
 # Autologin no TTY1 (pode remover se não quiser)
 mkdir -p /etc/systemd/system/getty@tty1.service.d

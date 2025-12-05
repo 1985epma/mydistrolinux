@@ -15,8 +15,17 @@ Este script bash permite criar uma distribuição Linux ISO customizada a partir
 - **GRUB Customizado**: Menu de boot personalizado com múltiplas opções e tema visual
 - **Ambiente Desktop**: XFCE4 pré-configurado com LightDM
 - **Aplicativos Incluídos**: Firefox, VLC, GParted, Zsh e mais
-- **Repositórios Extras**: Suporte para Chrome, Edge, Spotify e Steam
+- **Repositórios Extensivos**: Kernels mais recentes, drivers proprietários (Intel/AMD/NVIDIA), ferramentas de desenvolvimento (VSCode, Docker, .NET, Node.js, Go, Ruby, PostgreSQL)
 - **Live System**: Sistema funcional em modo Live com opção de instalação
+
+## 📚 Documentação
+
+- **[README.md](README.md)** - Guia principal de instalação e uso
+- **[REPOSITORIES.md](REPOSITORIES.md)** - Lista completa de repositórios e pacotes disponíveis
+- **[SUDO-CONFIG.md](SUDO-CONFIG.md)** - Guia de configuração do sudo (com/sem senha, timeouts)
+- **[VAGRANT.md](VAGRANT.md)** - Guia detalhado para usar com Vagrant
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Como contribuir com o projeto
+- **[CHANGELOG.md](CHANGELOG.md)** - Histórico de versões
 
 ## 🔧 Requisitos
 
@@ -166,19 +175,239 @@ Independente do método escolhido:
 6. **ISO pronta**:
    - A ISO será gerada em: `~/minha-distro/NomeDaDistro-Versão-amd64.iso`
 
-## 📦 Pacotes Incluídos
+## 📦 Pacotes e Repositórios
 
-A distribuição vem com os seguintes pacotes pré-instalados:
+### Repositórios Incluídos
 
-- **Sistema Base**: linux-generic, systemd-sysv, sudo
+O script configura automaticamente os seguintes repositórios para garantir acesso às versões mais recentes:
+
+#### 🖥️ Kernel e Drivers
+- **Kernel Mainline PPA** (`cappelikan/ppa`) - Kernels Linux mais recentes
+- **Graphics Drivers PPA** (`graphics-drivers/ppa`) - Drivers NVIDIA, AMD e Intel atualizados
+- **Intel Graphics** (repositório oficial) - Drivers Intel otimizados
+- **Kernel OEM** - Suporte aprimorado para hardware recente
+
+#### 🌐 Navegadores
+- **Google Chrome** (repositório oficial)
+- **Microsoft Edge** (repositório oficial)
+
+#### 💻 Ferramentas de Desenvolvimento
+- **Visual Studio Code** (repositório Microsoft)
+- **Docker** (repositório oficial Docker)
+- **Git PPA** (`git-core/ppa`) - Versões mais recentes do Git
+- **.NET SDK** (repositório Microsoft)
+- **Node.js 20.x** (repositório NodeSource)
+- **Yarn** (gerenciador de pacotes JavaScript)
+- **PostgreSQL** (repositório oficial PostgreSQL)
+
+#### 🎵 Multimídia
+- **Spotify** (repositório oficial)
+- **OBS Studio PPA** - Software de gravação/streaming
+- **Steam** (para jogos)
+
+### Pacotes Disponíveis para Instalação
+
+Todos os pacotes abaixo estão disponíveis. Para instalar, edite `distro.sh` e descomente as linhas desejadas:
+
+#### Drivers de Hardware
+```bash
+# NVIDIA (auto-detecta GPU)
+nvidia-driver-535, nvidia-utils-535
+
+# AMD (drivers Mesa atualizados)
+mesa-vulkan-drivers, mesa-vdpau-drivers
+
+# Intel
+intel-gpu-tools, intel-media-va-driver
+
+# Kernel Manager (GUI para atualizar kernel)
+mainline
+```
+
+#### Linguagens de Programação
+```bash
+# Java OpenJDK
+openjdk-17-jdk, openjdk-17-jre, maven, gradle
+
+# .NET
+dotnet-sdk-8.0
+
+# Node.js v20
+nodejs, yarn
+
+# Python
+python3-pip, python3-venv, python3-dev
+
+# Go
+golang-go
+
+# Ruby
+ruby-full, bundler
+
+# Rust
+rustup (instalador oficial)
+```
+
+#### IDEs e Editores
+```bash
+# Visual Studio Code
+code
+
+# JetBrains Toolbox (IntelliJ, PyCharm, etc)
+# Instalação via wget script
+
+# Vim (incluído por padrão)
+vim
+```
+
+#### Bancos de Dados
+```bash
+# PostgreSQL
+postgresql, postgresql-contrib
+
+# MySQL
+mysql-server
+
+# MongoDB
+mongodb-org
+
+# Redis
+redis-server
+```
+
+#### DevOps e Ferramentas
+```bash
+# Docker + Compose
+docker-ce, docker-ce-cli, docker-compose-plugin
+
+# Git atualizado
+git, git-lfs
+
+# Postman (via Snap)
+postman
+
+# DBeaver (GUI BD, via Snap)
+dbeaver-ce
+
+# Insomnia (REST client, Snap)
+insomnia
+```
+
+#### Navegadores
+```bash
+google-chrome-stable
+microsoft-edge-stable
+firefox (padrão)
+```
+
+#### Multimídia
+```bash
+spotify-client
+obs-studio
+steam-installer
+vlc (padrão)
+```
+
+### Como Personalizar Pacotes
+
+1. Abra `distro.sh` em um editor
+2. Localize a seção "PACOTES BÁSICOS" e "FERRAMENTAS DE DESENVOLVIMENTO"
+3. Descomente as linhas dos pacotes desejados:
+
+```bash
+# Antes (não instala)
+# DEBIAN_FRONTEND=noninteractive apt install -y docker-ce
+
+# Depois (instala)
+DEBIAN_FRONTEND=noninteractive apt install -y docker-ce
+```
+
+### Pacotes Básicos (sempre instalados)
+
+- **Kernel**: linux-generic, linux-generic-hwe
+- **Sistema**: systemd-sysv, sudo, vim
 - **Rede**: network-manager
-- **Live System**: casper, discover, laptop-detect, os-prober
-- **Boot**: grub-pc-bin, grub-efi-amd64-bin
 - **Desktop**: xorg, lightdm, xfce4, xfce4-goodies
-- **Aplicativos**: firefox, vlc, gparted, vim, curl, wget, zsh
-- **Utilitários**: dialog
+- **Apps**: firefox, vlc, gparted, zsh
+- **Boot**: casper, grub-pc-bin, grub-efi-amd64-bin
 
 ## 🎨 Personalização
+
+### Configuração do Sudo
+
+O script oferece múltiplas opções de configuração do sudo para diferentes necessidades:
+
+#### Opção 1: Sudo SEM Senha (Padrão Ativo)
+**Ideal para:** Ambientes de desenvolvimento, uso pessoal, VMs de teste
+
+```bash
+# Já configurado por padrão no script
+echo "$USERNAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/$USERNAME
+```
+
+**Vantagens:**
+- ✅ Não precisa digitar senha em cada comando sudo
+- ✅ Ideal para desenvolvimento e automação
+- ✅ Conveniente para uso diário
+
+**Desvantagens:**
+- ⚠️ Menos seguro para ambientes de produção
+- ⚠️ Qualquer processo pode executar comandos privilegiados
+
+#### Opção 2: Sudo COM Senha e Timeout Maior
+**Ideal para:** Uso compartilhado, maior segurança com conveniência
+
+Para ativar, edite `distro.sh` e descomente:
+
+```bash
+# OPÇÃO 2: Sudo COM senha mas com timeout maior
+echo "Defaults timestamp_timeout=60" >> /etc/sudoers.d/sudo-timeout
+```
+
+E **comente** a OPÇÃO 1:
+```bash
+# echo "$USERNAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/$USERNAME
+```
+
+**Configurações de Timeout:**
+- `timestamp_timeout=60` - 60 minutos (recomendado)
+- `timestamp_timeout=30` - 30 minutos
+- `timestamp_timeout=0` - Sempre pedir senha
+- `timestamp_timeout=-1` - Nunca pedir senha novamente (sessão)
+
+#### Opção 3: Sudo Padrão (Senha + 15 minutos)
+**Ideal para:** Segurança máxima, ambientes multi-usuário
+
+Comente a OPÇÃO 1 e 2 no script:
+```bash
+# echo "$USERNAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/$USERNAME
+# echo "Defaults timestamp_timeout=60" >> /etc/sudoers.d/sudo-timeout
+```
+
+#### Opção 4: Desabilitar Senha de Root
+**Ideal para:** Ambientes de desenvolvimento isolados
+
+Descomente no script:
+```bash
+passwd -d root  # Remove senha do root
+```
+
+### Configuração Pós-Instalação
+
+Se já criou a ISO, pode modificar depois:
+
+```bash
+# Adicionar usuário sem senha no sudo
+echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$USER
+sudo chmod 0440 /etc/sudoers.d/$USER
+
+# Aumentar timeout do sudo
+echo "Defaults timestamp_timeout=60" | sudo tee /etc/sudoers.d/sudo-timeout
+
+# Voltar ao padrão
+sudo rm /etc/sudoers.d/$USER
+sudo rm /etc/sudoers.d/sudo-timeout
+```
 
 ### GRUB Customizado
 
@@ -319,6 +548,98 @@ Adicione suas personalizações no script do chroot (após linha ~80).
 ```
 
 ## 🐛 Solução de Problemas
+
+### Drivers e Hardware
+
+#### Drivers NVIDIA não funcionam
+```bash
+# Verificar GPU detectada
+lspci | grep -i nvidia
+
+# Reinstalar driver
+sudo apt purge nvidia-* -y
+sudo apt install nvidia-driver-535 -y
+sudo reboot
+
+# Verificar instalação
+nvidia-smi
+```
+
+#### Problemas com drivers Intel
+```bash
+# Instalar drivers Intel completos
+sudo apt install intel-gpu-tools intel-media-va-driver -y
+
+# Verificar aceleração
+vainfo
+```
+
+#### Atualizar kernel para hardware novo
+```bash
+# Instalar Mainline (GUI para kernels)
+sudo apt install mainline -y
+mainline-gtk  # Interface gráfica
+
+# Ou instalar kernel OEM manualmente
+sudo apt install linux-oem-22.04 -y
+sudo reboot
+```
+
+### Desenvolvimento
+
+#### VSCode não abre
+```bash
+# Reinstalar
+sudo apt remove code -y
+sudo apt update
+sudo apt install code -y
+
+# Ou via Snap
+sudo snap install code --classic
+```
+
+#### Docker permissões negadas
+```bash
+# Adicionar usuário ao grupo docker
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Testar
+docker run hello-world
+```
+
+#### Node.js/NPM comandos não encontrados
+```bash
+# Verificar versão instalada
+node --version
+npm --version
+
+# Se não instalado, instalar Node.js 20
+sudo apt update
+sudo apt install nodejs -y
+```
+
+#### .NET SDK não encontrado
+```bash
+# Verificar instalação
+dotnet --version
+
+# Reinstalar se necessário
+sudo apt install dotnet-sdk-8.0 -y
+```
+
+#### PostgreSQL não inicia
+```bash
+# Verificar status
+sudo systemctl status postgresql
+
+# Iniciar manualmente
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# Acessar
+sudo -u postgres psql
+```
 
 ### Vagrant
 
