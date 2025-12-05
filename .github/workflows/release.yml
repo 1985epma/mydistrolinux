@@ -151,71 +151,15 @@ EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  auto-version:
-    name: Auto Incrementar Versão
-    runs-on: ubuntu-latest
-    needs: validate
-    if: github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
-    steps:
-      - name: Checkout código
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configurar Git
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-
-      - name: Calcular próxima versão
-        id: next_version
-        run: |
-          # Obter última tag
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "📌 Última tag: $LAST_TAG"
-          
-          # Extrair números da versão
-          VERSION=${LAST_TAG#v}
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-          
-          # Verificar tipo de commit para decidir incremento
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          
-          if [[ $COMMIT_MSG == *"BREAKING CHANGE"* ]] || [[ $COMMIT_MSG == *"major"* ]]; then
-            MAJOR=$((MAJOR + 1))
-            MINOR=0
-            PATCH=0
-            TYPE="major"
-          elif [[ $COMMIT_MSG == *"feat"* ]] || [[ $COMMIT_MSG == *"feature"* ]]; then
-            MINOR=$((MINOR + 1))
-            PATCH=0
-            TYPE="minor"
-          else
-            PATCH=$((PATCH + 1))
-            TYPE="patch"
-          fi
-          
-          NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
-          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "type=$TYPE" >> $GITHUB_OUTPUT
-          echo "🎯 Nova versão: $NEW_VERSION (tipo: $TYPE)"
-
-      - name: Criar e enviar tag
-        env:
-          NEW_VERSION: ${{ steps.next_version.outputs.version }}
-          VERSION_TYPE: ${{ steps.next_version.outputs.type }}
-        run: |
-          # Verificar se já existe commits desde última tag
-          if git describe --exact-match HEAD 2>/dev/null; then
-            echo "⏭️  HEAD já está em uma tag, pulando..."
-            exit 0
-          fi
-          
-          # Criar tag anotada
-          git tag -a $NEW_VERSION -m "🔖 Release $NEW_VERSION (auto-$VERSION_TYPE)"
-          git push origin $NEW_VERSION
-          echo "✅ Tag $NEW_VERSION criada e enviada"
+  # Desabilitado por enquanto - usar release.sh manual ou tags manuais
+  # auto-version:
+  #   name: Auto Incrementar Versão
+  #   runs-on: ubuntu-latest
+  #   needs: validate
+  #   if: github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
+  #   steps:
+  #     - name: Checkout código
+  #       uses: actions/checkout@v4
 
   docker-test:
     name: Testar em Container
@@ -247,7 +191,7 @@ EOF
   notify:
     name: Notificar Status
     runs-on: ubuntu-latest
-    needs: [validate, version-check, create-release]
+    needs: [validate, version-check]
     if: always()
     steps:
       - name: Resumo do workflow
@@ -259,10 +203,5 @@ EOF
           echo "- **Autor**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Validação**: ${{ needs.validate.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Versão**: ${{ needs.version-check.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          
-          if [ "${{ needs.create-release.result }}" != "skipped" ]; then
-            echo "- **Release**: ${{ needs.create-release.result }}" >> $GITHUB_STEP_SUMMARY
-          fi
-          
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✅ Pipeline concluído!" >> $GITHUB_STEP_SUMMARY
