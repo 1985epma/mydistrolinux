@@ -507,11 +507,11 @@ chmod 0440 /etc/sudoers.d/\$USERNAME
 # DEBIAN_FRONTEND=noninteractive apt install -y build-essential procps curl file git
 
 # Instalar Homebrew como o usuário criado
-# su - \$USERNAME -c 'NONINTERACTIVE=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+# su - "\$USERNAME" -c 'NONINTERACTIVE=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
 
 # Adicionar Homebrew ao PATH do usuário
-# su - \$USERNAME -c 'echo "eval \"\\\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" >> /home/\$USERNAME/.bashrc'
-# su - \$USERNAME -c 'echo "eval \"\\\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" >> /home/\$USERNAME/.zshrc'
+# su - "\$USERNAME" -c 'echo "eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" >> "/home/\$USERNAME/.bashrc"'
+# su - "\$USERNAME" -c 'echo "eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" >> "/home/\$USERNAME/.zshrc"'
 
 # Autologin no TTY1 (pode remover se não quiser)
 mkdir -p /etc/systemd/system/getty@tty1.service.d

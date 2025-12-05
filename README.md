@@ -23,6 +23,7 @@ Este script bash permite criar uma distribuição Linux ISO customizada a partir
 - **[README.md](README.md)** - Guia principal de instalação e uso
 - **[REPOSITORIES.md](REPOSITORIES.md)** - Lista completa de repositórios e pacotes disponíveis
 - **[SUDO-CONFIG.md](SUDO-CONFIG.md)** - Guia de configuração do sudo (com/sem senha, timeouts)
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Solução de problemas e erros comuns
 - **[VAGRANT.md](VAGRANT.md)** - Guia detalhado para usar com Vagrant
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Como contribuir com o projeto
 - **[CHANGELOG.md](CHANGELOG.md)** - Histórico de versões
