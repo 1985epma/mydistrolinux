@@ -943,10 +943,27 @@ Os logs de construção ficam em `/tmp/`:
 
 ## 🤝 Contribuindo
 
-Contribuições são bem-vindas! Sinta-se à vontade para:
-- Reportar bugs
-- Sugerir novas funcionalidades
-- Enviar pull requests
+Contribuições são bem-vindas! 🎉
+
+### 📋 Como Contribuir
+
+1. **Fork** o repositório
+2. Crie um branch a partir de `dev`: `git checkout -b feature/minha-feature`
+3. Faça suas alterações seguindo os padrões do projeto
+4. Teste localmente: `bash -n distro.sh && shellcheck distro.sh`
+5. Commit com mensagens descritivas: `git commit -m "feat: adicionar funcionalidade X"`
+6. Push para seu fork: `git push origin feature/minha-feature`
+7. Abra um **Pull Request** para o branch `dev`
+
+### 🐛 Reportar Bugs / ✨ Sugerir Features
+
+Use os **templates de Issues** disponíveis:
+- 🐛 **Bug Report** - Para reportar problemas
+- ✨ **Feature Request** - Para sugerir funcionalidades
+- 📝 **Documentação** - Para melhorias em docs
+- 📦 **Novo Repositório** - Para adicionar pacotes
+
+**Veja o guia completo:** [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## 📄 Licença
 

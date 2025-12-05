@@ -1,13 +1,44 @@
-# Contributing to MyDistroLinux
+# 🤝 Guia de Contribuição
 
-Obrigado por considerar contribuir com o MyDistroLinux! 🎉
+Obrigado por considerar contribuir com o **MyDistroLinux Builder**! 🎉
 
-## Como Contribuir
+Este guia ajudará você a entender como contribuir de forma eficaz.
 
-### Reportando Bugs
+---
 
-1. Verifique se o bug já não foi reportado nas [Issues](https://github.com/1985epma/mydistrolinux/issues)
-2. Abra uma nova issue com o template de bug
+## 📋 Índice
+
+- [Código de Conduta](#código-de-conduta)
+- [Como Contribuir](#como-contribuir)
+- [Workflow Git](#workflow-git)
+- [Padrões de Código](#padrões-de-código)
+- [Commits e Mensagens](#commits-e-mensagens)
+- [Pull Requests](#pull-requests)
+- [Issues](#issues)
+- [Testes](#testes)
+
+---
+
+## 🤝 Código de Conduta
+
+Este projeto segue um código de conduta simples:
+
+- ✅ Seja respeitoso e profissional
+- ✅ Aceite críticas construtivas
+- ✅ Foque no que é melhor para a comunidade
+- ❌ Não use linguagem ofensiva ou inadequada
+- ❌ Não publique informações privadas de terceiros
+
+---
+
+## 🚀 Como Contribuir
+
+### 1️⃣ Reportar Bugs
+
+Use o template de **Bug Report** para reportar problemas:
+
+1. Vá em **Issues** → **New Issue**
+2. Selecione **🐛 Bug Report**
 3. Inclua informações detalhadas:
    - Sistema operacional e versão
    - Logs relevantes (`/tmp/*.log`)
