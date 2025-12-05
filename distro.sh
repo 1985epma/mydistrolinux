@@ -76,14 +76,14 @@ mkdir -p "$CHROOT_DIR" "$IMAGE_DIR"/{casper,isolinux,boot/grub} "$EFI_DIR"
   STEP() { P=$((P + $1)); echo "$P"; echo "# $2"; }
 
   # 3.1 Debootstrap
-  STEP 5 "Preparando ambiente..."
+  STEP 5 "Preparando ambiente... (5%)"
   sleep 1
 
-  STEP 10 "Instalando sistema base Ubuntu com debootstrap..."
+  STEP 10 "Instalando sistema base Ubuntu com debootstrap... (15%)"
   sudo debootstrap --arch="$ARCH" "$UBUNTU_RELEASE" "$CHROOT_DIR" "$UBUNTU_MIRROR" > /tmp/debootstrap.log 2>&1 || erro "Falha no debootstrap. Veja /tmp/debootstrap.log"
 
   # 3.2 Montar sistemas de arquivos
-  STEP 10 "Montando /dev, /proc, /sys dentro do chroot..."
+  STEP 10 "Montando /dev, /proc, /sys dentro do chroot... (25%)"
   sudo mount --bind /dev "$CHROOT_DIR/dev"
   sudo mount --bind /run "$CHROOT_DIR/run"
   sudo mount -t proc /proc "$CHROOT_DIR/proc"
@@ -91,7 +91,7 @@ mkdir -p "$CHROOT_DIR" "$IMAGE_DIR"/{casper,isolinux,boot/grub} "$EFI_DIR"
   sudo mount -t devpts devpts "$CHROOT_DIR/dev/pts"
 
   # 3.3 Script interno do chroot
-  STEP 5 "Criando script de configuração dentro do chroot..."
+  STEP 5 "Criando script de configuração dentro do chroot... (30%)"
   CHROOT_SCRIPT="/tmp/chroot-setup.sh"
   sudo tee "$CHROOT_DIR$CHROOT_SCRIPT" > /dev/null << EOF_CHROOT
 #!/usr/bin/env bash
@@ -197,12 +197,12 @@ EOF_CHROOT
 
   sudo chmod +x "$CHROOT_DIR$CHROOT_SCRIPT"
 
-  STEP 15 "Entrando no chroot para instalar pacotes (isso pode demorar)..."
+  STEP 15 "Entrando no chroot para instalar pacotes... (45%) - Isso pode demorar!"
   sudo chroot "$CHROOT_DIR" "$CHROOT_SCRIPT" > /tmp/chroot-setup.log 2>&1 || erro "Falha ao configurar chroot. Veja /tmp/chroot-setup.log"
   sudo rm "$CHROOT_DIR$CHROOT_SCRIPT"
 
   # 3.4 Desmontar chroot
-  STEP 5 "Desmontando sistemas de arquivos do chroot..."
+  STEP 5 "Desmontando sistemas de arquivos do chroot... (50%)"
   sudo umount -lf "$CHROOT_DIR/dev/pts" || true
   sudo umount -lf "$CHROOT_DIR/proc" || true
   sudo umount -lf "$CHROOT_DIR/sys" || true
@@ -210,24 +210,24 @@ EOF_CHROOT
   sudo umount -lf "$CHROOT_DIR/dev" || true
 
   # 3.5 Kernel e initrd
-  STEP 5 "Copiando kernel e initrd para a imagem..."
+  STEP 5 "Copiando kernel e initrd para a imagem... (55%)"
   KERNEL_VERSION=$(ls "$CHROOT_DIR/boot" | grep -E '^vmlinuz-' | sed 's/vmlinuz-//')
   sudo cp "$CHROOT_DIR/boot/vmlinuz-$KERNEL_VERSION" "$IMAGE_DIR/casper/vmlinuz"
   sudo cp "$CHROOT_DIR/boot/initrd.img-$KERNEL_VERSION" "$IMAGE_DIR/casper/initrd"
 
   # 3.6 Criar filesystem.squashfs
-  STEP 15 "Criando filesystem.squashfs (sistema comprimido)..."
+  STEP 15 "Criando filesystem.squashfs... (70%) - Comprimindo sistema!"
   sudo mksquashfs "$CHROOT_DIR" "$IMAGE_DIR/casper/filesystem.squashfs" -e boot > /tmp/mksquashfs.log 2>&1 || erro "Falha ao criar squashfs. Veja /tmp/mksquashfs.log"
 
   # 3.7 Metadados
-  STEP 3 "Criando arquivos de metadados..."
+  STEP 3 "Criando arquivos de metadados... (73%)"
   echo "$DISTRO_NAME $DISTRO_VERSION" | sudo tee "$IMAGE_DIR/README" > /dev/null
   echo "$DISTRO_NAME" | sudo tee "$IMAGE_DIR/casper/hostname" > /dev/null
   printf "LABEL=%s\n" "$DISTRO_NAME" | sudo tee "$IMAGE_DIR/casper/label" > /dev/null
   sudo du -sx --block-size=1 "$CHROOT_DIR" | cut -f1 | sudo tee "$IMAGE_DIR/casper/filesystem.size" > /dev/null
 
   # 3.8 ISOLINUX BIOS CUSTOMIZADO
-  STEP 5 "Configurando ISOLINUX customizado (boot BIOS)..."
+  STEP 5 "Configurando ISOLINUX customizado (boot BIOS)... (78%)"
   sudo tee "$IMAGE_DIR/isolinux/isolinux.cfg" > /dev/null << EOF_ISO
 UI menu.c32
 PROMPT 0
@@ -273,7 +273,7 @@ EOF_ISO
   sudo cp /usr/lib/syslinux/modules/bios/menu.c32 "$IMAGE_DIR/isolinux/" || erro "Não encontrei menu.c32"
 
   # 3.9 GRUB UEFI CUSTOMIZADO
-  STEP 5 "Configurando GRUB customizado (UEFI)..."
+  STEP 5 "Configurando GRUB customizado (UEFI)... (83%)"
   sudo tee "$IMAGE_DIR/boot/grub/grub.cfg" > /dev/null << EOF_GRUB
 # Configuração personalizada do GRUB
 set default=0
@@ -355,7 +355,7 @@ menuentry "⏻ Desligar" --class shutdown {
 }
 EOF_GRUB
 
-  STEP 5 "Criando imagem de boot UEFI..."
+  STEP 5 "Criando imagem de boot UEFI... (88%)"
   truncate -s 64M "$EFI_DIR/efiboot.img"
   mkfs.vfat "$EFI_DIR/efiboot.img" > /dev/null
 
@@ -375,7 +375,7 @@ EOF_GRUB
   cp "$EFI_DIR/efiboot.img" "$IMAGE_DIR/EFI/boot/efiboot.img"
 
   # 3.10 Criar ISO
-  STEP 12 "Gerando ISO final..."
+  STEP 12 "Gerando ISO final... (100%) - Quase lá!"
   cd "$IMAGE_DIR"
 
   ISO_NAME="${DISTRO_NAME}-${DISTRO_VERSION}-${ARCH}.iso"
@@ -394,7 +394,7 @@ EOF_GRUB
       -no-emul-boot \
     . > /tmp/xorriso.log 2>&1 || erro "Falha ao criar ISO. Veja /tmp/xorriso.log"
 
-  STEP 10 "Finalizando..."
+  STEP 10 "Concluído! 🎉"
   sleep 1
 
 ) | zenity --progress \
