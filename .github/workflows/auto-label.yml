@@ -1,0 +1,60 @@
+name: Auto Label
+
+on:
+  issues:
+    types: [opened, edited]
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    
+    steps:
+      - name: Auto-label based on title
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.issue?.title || context.payload.pull_request?.title;
+            const number = context.payload.issue?.number || context.payload.pull_request?.number;
+            const isIssue = !!context.payload.issue;
+            
+            const labels = [];
+            
+            // Detectar tipo por prefixo no título
+            if (title.includes('[BUG]') || title.toLowerCase().includes('bug') || title.toLowerCase().includes('erro')) {
+              labels.push('bug');
+            }
+            if (title.includes('[FEATURE]') || title.toLowerCase().includes('feature') || title.toLowerCase().includes('funcionalidade')) {
+              labels.push('enhancement');
+            }
+            if (title.includes('[DOCS]') || title.toLowerCase().includes('documentação') || title.toLowerCase().includes('readme')) {
+              labels.push('documentation');
+            }
+            if (title.includes('[REPO]') || title.toLowerCase().includes('repositório') || title.toLowerCase().includes('pacote')) {
+              labels.push('repository');
+            }
+            if (title.toLowerCase().includes('ci') || title.toLowerCase().includes('cd') || title.toLowerCase().includes('workflow')) {
+              labels.push('ci/cd');
+            }
+            if (title.toLowerCase().includes('vagrant') || title.toLowerCase().includes('vm')) {
+              labels.push('vagrant');
+            }
+            if (title.toLowerCase().includes('grub') || title.toLowerCase().includes('boot')) {
+              labels.push('bootloader');
+            }
+            
+            // Adicionar labels
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: number,
+                labels: labels
+              });
+              
+              console.log(`Added labels: ${labels.join(', ')}`);
+            }

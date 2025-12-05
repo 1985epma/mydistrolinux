@@ -1,0 +1,25 @@
+# Configuração automática de labels baseada em arquivos alterados
+
+'documentation':
+  - '**/*.md'
+  - 'docs/**/*'
+
+'ci/cd':
+  - '.github/workflows/**'
+  - '.github/**'
+
+'vagrant':
+  - 'Vagrantfile'
+  - 'vagrant-setup.sh'
+  - 'VAGRANT.md'
+
+'bootloader':
+  - '**/grub/**'
+  - '**/isolinux/**'
+
+'script':
+  - 'distro.sh'
+
+'repository':
+  - 'REPOSITORIES.md'
+  - 'ADICIONADOS.md'

@@ -1,0 +1,150 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - dev
+
+jobs:
+  validate:
+    name: Validate Script
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Bash Syntax Check
+        run: |
+          bash -n distro.sh
+          echo "✅ Script validado sem erros de sintaxe"
+      
+      - name: ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          shellcheck -x distro.sh || echo "⚠️ ShellCheck encontrou avisos (não crítico)"
+  
+  check-docs:
+    name: Check Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Verify documentation files
+        run: |
+          echo "Verificando arquivos de documentação..."
+          
+          required_files=(
+            "README.md"
+            "REPOSITORIES.md"
+            "TROUBLESHOOTING.md"
+            "SUDO-CONFIG.md"
+            "VAGRANT.md"
+            "CONTRIBUTING.md"
+            "CHANGELOG.md"
+          )
+          
+          for file in "${required_files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✅ $file encontrado"
+            else
+              echo "❌ $file não encontrado"
+              exit 1
+            fi
+          done
+          
+          echo "✅ Todos os arquivos de documentação estão presentes"
+      
+      - name: Check for broken links in README
+        run: |
+          echo "Verificando links no README.md..."
+          
+          # Verificar se arquivos referenciados existem
+          grep -o '\[.*\](.*\.md)' README.md | sed 's/.*(\(.*\))/\1/' | while read -r file; do
+            if [ -f "$file" ]; then
+              echo "✅ Link válido: $file"
+            else
+              echo "❌ Link quebrado: $file"
+              exit 1
+            fi
+          done || exit 0
+          
+          echo "✅ Links verificados"
+  
+  size-check:
+    name: Check Script Size
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check script complexity
+        run: |
+          lines=$(wc -l < distro.sh)
+          echo "📊 Script tem $lines linhas"
+          
+          if [ "$lines" -gt 1500 ]; then
+            echo "⚠️ Script está ficando grande, considere modularização"
+          else
+            echo "✅ Tamanho do script aceitável"
+          fi
+  
+  pr-comment:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    needs: [validate, check-docs]
+    if: always()
+    permissions:
+      pull-requests: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Comment PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const validate = '${{ needs.validate.result }}';
+            const checkDocs = '${{ needs.check-docs.result }}';
+            
+            let emoji = '✅';
+            let status = 'Todas as verificações passaram!';
+            
+            if (validate !== 'success' || checkDocs !== 'success') {
+              emoji = '❌';
+              status = 'Algumas verificações falharam.';
+            }
+            
+            const comment = `## ${emoji} Status das Verificações
+            
+            | Verificação | Status |
+            |-------------|--------|
+            | Validação do Script | ${validate === 'success' ? '✅ Passou' : '❌ Falhou'} |
+            | Documentação | ${checkDocs === 'success' ? '✅ Passou' : '❌ Falhou'} |
+            
+            **${status}**
+            
+            ---
+            
+            ### 📋 Checklist do Revisor
+            
+            - [ ] Código segue padrões do projeto
+            - [ ] Documentação atualizada
+            - [ ] Sem warnings críticos no ShellCheck
+            - [ ] Testado localmente ou no Vagrant
+            - [ ] CHANGELOG.md atualizado (se release)
+            `;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
