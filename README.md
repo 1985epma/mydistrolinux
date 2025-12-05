@@ -313,43 +313,38 @@ Este projeto utiliza GitHub Actions para automação completa de releases e cont
 
 ### Workflows Disponíveis
 
-#### Release Automática
-- **Trigger**: Push de tags `v*` ou commits na branch `main`
-- **Ações**:
-  - Validação de sintaxe bash com ShellCheck
-  - Versionamento semântico automático
-  - Geração de changelog
-  - Criação de releases no GitHub
-  - Upload de arquivos (script, README, ZIP)
-
-#### Linter e Quality Check
+#### 1. Validação Contínua (`validate.yml`)
 - **Trigger**: Push ou PR em `main`/`develop`
 - **Ações**:
-  - Análise estática de código
-  - Validação de Markdown
-  - Verificação de ortografia
+  - ✅ Validação de sintaxe bash
+  - ✅ Análise com ShellCheck
+  - ✅ Verificação de permissões
+  - ✅ Resumo no GitHub
+
+#### 2. Linter e Quality Check (`lint.yml`)
+- **Trigger**: Push ou PR em `main`/`develop`
+- **Ações**:
+  - ✅ ShellCheck detalhado
+  - ✅ Validação de Markdown
+  - ✅ Verificações básicas
+
+#### 3. Release Automática (`tag-release.yml`)
+- **Trigger**: Push de tags `v*` (exemplo: `v1.0.0`)
+- **Ações**:
+  - ✅ Validação completa
+  - ✅ Geração de changelog automático
+  - ✅ Criação de release no GitHub
+  - ✅ Upload de arquivos:
+    - `distro.sh` - Script principal
+    - `README.md` - Documentação
+    - `mydistrolinux-X.Y.Z.zip` - Pacote completo
+    - `install.sh` - Instalador rápido
 
 ### Como Criar uma Release
 
-#### Método 1: Automático (recomendado)
+#### Método 1: Script Interativo (Recomendado)
 ```bash
-# Fazer commit normal
-git add .
-git commit -m "feat: adicionar nova funcionalidade"
-git push origin main
-
-# O CI/CD automaticamente cria a versão patch/minor/major
-# baseado na mensagem de commit
-```
-
-**Convenção de commits**:
-- `feat:` ou `feature:` → incrementa versão **minor** (1.0.0 → 1.1.0)
-- `fix:` ou `bugfix:` → incrementa versão **patch** (1.0.0 → 1.0.1)
-- `BREAKING CHANGE:` ou `major:` → incrementa versão **major** (1.0.0 → 2.0.0)
-
-#### Método 2: Manual com Script
-```bash
-# Executar script interativo
+# Executar script de release
 ./release.sh
 
 # Escolher tipo de release:
@@ -357,11 +352,33 @@ git push origin main
 # 2) minor  - Features (1.0.0 → 1.1.0)
 # 3) major  - Breaking (1.0.0 → 2.0.0)
 # 4) custom - Versão específica
+
+# O script automaticamente:
+# - Atualiza VERSION
+# - Cria tag anotada
+# - Faz push (opcional)
 ```
 
-#### Método 3: Tag Manual
+#### Método 2: Tag Manual
 ```bash
-# Criar tag manualmente
+# Criar e enviar tag
+git tag -a v1.2.0 -m "Release 1.2.0 - Nova funcionalidade X"
+git push origin v1.2.0
+
+# O CI/CD automaticamente:
+# 1. Detecta a tag
+# 2. Valida o código
+# 3. Gera changelog
+# 4. Cria release no GitHub
+# 5. Faz upload dos arquivos
+```
+
+#### Método 3: GitHub Interface
+1. Acesse: `https://github.com/1985epma/mydistrolinux/releases/new`
+2. Crie uma nova tag (ex: `v1.2.0`)
+3. Preencha título e descrição
+4. Publique a release
+5. O CI/CD será executado automaticamente
 git tag -a v1.2.0 -m "Release 1.2.0 - Descrição"
 git push origin v1.2.0
 
