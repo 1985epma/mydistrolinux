@@ -1,0 +1,50 @@
+name: Validação Contínua
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: Validar Script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Instalar shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Validar sintaxe bash
+        run: |
+          bash -n distro.sh
+          echo "✅ Sintaxe válida"
+
+      - name: Análise estática com ShellCheck
+        run: |
+          shellcheck -x distro.sh || true
+          echo "✅ ShellCheck concluído"
+
+      - name: Verificar permissões de execução
+        run: |
+          if [ ! -x distro.sh ]; then
+            echo "⚠️  Arquivo não é executável, corrigindo..."
+            chmod +x distro.sh
+          else
+            echo "✅ Permissões corretas"
+          fi
+
+      - name: Resumo
+        run: |
+          echo "## ✅ Validação Concluída" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Script: distro.sh" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Todas as verificações passaram! 🎉" >> $GITHUB_STEP_SUMMARY

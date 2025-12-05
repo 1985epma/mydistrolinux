@@ -2,8 +2,6 @@ name: Release and Version Management
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
   pull_request:
