@@ -20,11 +20,13 @@ Este script bash permite criar uma distribuição Linux ISO customizada a partir
 
 ## 🔧 Requisitos
 
-### Sistema Operacional
+### Opção 1: Sistema Local
+
+#### Sistema Operacional
 - Ubuntu/Debian ou derivados (testado em Ubuntu 24.04)
 - Ambiente com interface gráfica (para Zenity)
 
-### Pacotes Necessários
+#### Pacotes Necessários
 ```bash
 sudo apt update
 sudo apt install -y \
@@ -39,14 +41,36 @@ sudo apt install -y \
     zenity
 ```
 
-### Espaço em Disco
+#### Espaço em Disco
 - Mínimo: **15 GB** livres
 - Recomendado: **20 GB** ou mais
 
-### Permissões
+#### Permissões
 - Acesso `sudo` (o script solicitará senha quando necessário)
 
+### Opção 2: Vagrant (Recomendado para Windows/Mac)
+
+#### Pré-requisitos
+- [Vagrant](https://www.vagrantup.com/downloads) 2.0 ou superior
+- [VirtualBox](https://www.virtualbox.org/wiki/Downloads) 6.0 ou superior
+- **8 GB RAM** no host (VM usa 4 GB)
+- **25 GB** de espaço em disco livre
+
+#### Sistemas Suportados
+- ✅ Windows 10/11
+- ✅ macOS (Intel e Apple Silicon via Rosetta)
+- ✅ Linux (qualquer distribuição)
+
+**Vantagens do Vagrant:**
+- ✅ Configuração automática completa
+- ✅ Ambiente isolado e reproduzível
+- ✅ Interface gráfica incluída
+- ✅ Todas as dependências pré-instaladas
+- ✅ Não afeta o sistema host
+
 ## 🚀 Como Usar
+
+### Opção 1: Sistema Local (Linux com GUI)
 
 1. **Clone o repositório ou baixe o script**:
    ```bash
@@ -54,17 +78,80 @@ sudo apt install -y \
    cd mydistrolinux
    ```
 
-2. **Torne o script executável**:
+2. **Instale as dependências**:
+   ```bash
+   sudo apt update
+   sudo apt install -y \
+       debootstrap \
+       squashfs-tools \
+       xorriso \
+       isolinux \
+       syslinux-utils \
+       grub-pc-bin \
+       grub-efi-amd64-bin \
+       mtools \
+       zenity
+   ```
+
+3. **Torne o script executável**:
    ```bash
    chmod +x distro.sh
    ```
 
-3. **Execute o script**:
+4. **Execute o script**:
    ```bash
    ./distro.sh
    ```
 
-4. **Siga os diálogos**:
+### Opção 2: Vagrant (Qualquer SO - Windows/Mac/Linux)
+
+Vagrant cria automaticamente uma VM Ubuntu com interface gráfica e todas as dependências pré-instaladas.
+
+1. **Instale os pré-requisitos**:
+   - [Vagrant](https://www.vagrantup.com/downloads) (v2.0+)
+   - [VirtualBox](https://www.virtualbox.org/wiki/Downloads) (v6.0+)
+
+2. **Clone o repositório**:
+   ```bash
+   git clone https://github.com/1985epma/mydistrolinux.git
+   cd mydistrolinux
+   ```
+
+3. **Execute o script de setup**:
+   ```bash
+   ./vagrant-setup.sh
+   ```
+   
+   Ou manualmente:
+   ```bash
+   vagrant up
+   ```
+
+4. **Usar a VM**:
+   - A janela do VirtualBox abrirá automaticamente
+   - Login automático (usuário: vagrant)
+   - Clique no ícone "MyDistroLinux Builder" na área de trabalho
+   
+   Ou via terminal:
+   ```bash
+   vagrant ssh
+   cd /vagrant
+   ./distro.sh
+   ```
+
+**Comandos Vagrant úteis:**
+```bash
+vagrant suspend      # Pausar VM
+vagrant resume       # Retomar VM
+vagrant reload       # Reiniciar VM
+vagrant halt         # Desligar VM
+vagrant destroy      # Remover VM completamente
+vagrant ssh          # Acessar terminal da VM
+```
+
+### Seguindo os Diálogos
+
+Independente do método escolhido:
    - Digite o nome da sua distribuição
    - Digite a versão
    - Escolha a release base do Ubuntu (22.04 ou 24.04)
@@ -233,7 +320,35 @@ Adicione suas personalizações no script do chroot (após linha ~80).
 
 ## 🐛 Solução de Problemas
 
-### Erro no debootstrap
+### Vagrant
+
+#### VM não inicia
+```bash
+# Verificar status
+vagrant status
+
+# Ver logs detalhados
+vagrant up --debug
+
+# Reinstalar VM do zero
+vagrant destroy -f
+vagrant up
+```
+
+#### Interface gráfica não aparece
+1. Abra o VirtualBox Manager
+2. Clique duas vezes na VM "MyDistroLinux Builder"
+3. A janela deve aparecer com login automático
+
+#### Erro de permissões dentro da VM
+```bash
+vagrant ssh
+sudo chmod +x /vagrant/distro.sh
+```
+
+### Sistema Local
+
+#### Erro no debootstrap
 - Verifique sua conexão com a internet
 - Confira o log: `/tmp/debootstrap.log`
 
@@ -251,7 +366,21 @@ Adicione suas personalizações no script do chroot (após linha ~80).
 
 ## 🧪 Testando a ISO
 
-### VirtualBox
+### Opção 1: Vagrant (Dentro da VM)
+Se você usou Vagrant, a ISO estará em `/home/vagrant/minha-distro/` dentro da VM.
+
+### Opção 2: VirtualBox (Manual)
+```bash
+# Criar e iniciar VM
+VBoxManage createvm --name "MinhaDistro" --register
+VBoxManage modifyvm "MinhaDistro" --memory 2048 --vram 128 --cpus 2
+VBoxManage storagectl "MinhaDistro" --name "IDE" --add ide
+VBoxManage storageattach "MinhaDistro" --storagectl "IDE" \
+    --port 0 --device 0 --type dvddrive \
+    --medium ~/minha-distro/MinhaDistro-1.0-amd64.iso
+```
+
+### Opção 3: QEMU
 ```bash
 # Criar e iniciar VM
 VBoxManage createvm --name "MinhaDistro" --register
@@ -270,7 +399,24 @@ qemu-system-x86_64 -m 2048 -cdrom ~/minha-distro/MinhaDistro-1.0-amd64.iso -boot
 ### Gravar em USB
 ```bash
 # CUIDADO: Substitua /dev/sdX pelo dispositivo correto!
+# Use 'lsblk' para identificar o dispositivo USB
 sudo dd if=~/minha-distro/MinhaDistro-1.0-amd64.iso of=/dev/sdX bs=4M status=progress && sync
+```
+
+**No Windows (use Rufus ou balenaEtcher):**
+- [Rufus](https://rufus.ie/) - Recomendado
+- [balenaEtcher](https://www.balena.io/etcher/) - Multiplataforma
+
+**No macOS:**
+```bash
+# Identificar o disco
+diskutil list
+
+# Desmontar o disco (substitua diskN)
+diskutil unmountDisk /dev/diskN
+
+# Gravar ISO
+sudo dd if=MinhaDistro-1.0-amd64.iso of=/dev/rdiskN bs=1m
 ```
 
 ## 📝 Logs
@@ -297,8 +443,10 @@ Este projeto é de código aberto. Sinta-se livre para usar, modificar e distrib
 
 - Este script requer privilégios de superusuário (sudo)
 - O processo consome bastante CPU, memória e disco
-- Não execute em sistemas de produção sem testar antes
+- **Vagrant**: A primeira execução baixa ~1GB (Ubuntu box)
+- **Local**: Não execute em sistemas de produção sem testar antes
 - Sempre teste a ISO em ambiente virtual antes de usar em hardware real
+- No Windows/Mac, use Vagrant para melhor experiência
 
 ## 🔗 Recursos Úteis
 
