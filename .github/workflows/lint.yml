@@ -1,0 +1,47 @@
+name: Linter e Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  shellcheck:
+    name: ShellCheck Detalhado
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Executar ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          severity: warning
+          format: gcc
+        env:
+          SHELLCHECK_OPTS: -x -s bash
+
+  markdown-lint:
+    name: Validar Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Lint Markdown
+        uses: actionshub/markdownlint@main
+        with:
+          path: README.md
+          config: .markdownlint.json
+        continue-on-error: true
+
+  spell-check:
+    name: Verificar Ortografia
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Spell Check
+        uses: rojopolis/spellcheck-github-actions@0.35.0
+        with:
+          config_path: .spellcheck.yml
+        continue-on-error: true

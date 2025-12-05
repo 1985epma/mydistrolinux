@@ -1,0 +1,268 @@
+name: Release and Version Management
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  validate:
+    name: Validar Script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Instalar shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Validar sintaxe bash
+        run: |
+          bash -n distro.sh
+          echo "✅ Sintaxe válida"
+
+      - name: Análise estática com ShellCheck
+        run: |
+          shellcheck -x distro.sh || true
+          echo "✅ ShellCheck concluído"
+
+      - name: Verificar permissões de execução
+        run: |
+          if [ ! -x distro.sh ]; then
+            echo "⚠️  Arquivo não é executável, corrigindo..."
+            chmod +x distro.sh
+          else
+            echo "✅ Permissões corretas"
+          fi
+
+  version-check:
+    name: Verificar Versão
+    runs-on: ubuntu-latest
+    needs: validate
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      has_tag: ${{ steps.check_tag.outputs.has_tag }}
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Obter versão do script
+        id: get_version
+        run: |
+          # Extrair versão do script se houver
+          VERSION=$(grep -oP 'DISTRO_VERSION=.*entry-text="\K[^"]+' distro.sh || echo "1.0")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Versão detectada: $VERSION"
+
+      - name: Verificar se é tag
+        id: check_tag
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            echo "has_tag=true" >> $GITHUB_OUTPUT
+            echo "🏷️  Tag detectada: $GITHUB_REF"
+          else
+            echo "has_tag=false" >> $GITHUB_OUTPUT
+            echo "📝 Push normal (sem tag)"
+          fi
+
+  create-release:
+    name: Criar Release
+    runs-on: ubuntu-latest
+    needs: [validate, version-check]
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extrair informações da tag
+        id: tag_info
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "🏷️  Tag: $TAG | Versão: $VERSION"
+
+      - name: Gerar changelog
+        id: changelog
+        run: |
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+          
+          if [ -z "$PREVIOUS_TAG" ]; then
+            CHANGELOG="## 🎉 Primeira Release\n\n$(git log --pretty=format:'- %s (%h)' | head -20)"
+          else
+            CHANGELOG="## 📝 Mudanças desde $PREVIOUS_TAG\n\n$(git log $PREVIOUS_TAG..HEAD --pretty=format:'- %s (%h)')"
+          fi
+          
+          echo "$CHANGELOG" > CHANGELOG.md
+          echo "📄 Changelog gerado"
+
+      - name: Criar arquivo de release
+        run: |
+          mkdir -p release
+          cp distro.sh release/
+          cp README.md release/
+          
+          # Criar script de instalação rápida
+          cat > release/install.sh << 'EOF'
+#!/bin/bash
+echo "🚀 Instalando MyDistroLinux Builder..."
+wget -O distro.sh https://github.com/${{ github.repository }}/releases/latest/download/distro.sh
+chmod +x distro.sh
+echo "✅ Instalação concluída!"
+echo "Execute: ./distro.sh"
+EOF
+          chmod +x release/install.sh
+
+      - name: Criar arquivo ZIP
+        run: |
+          cd release
+          zip -r ../mydistrolinux-${{ steps.tag_info.outputs.version }}.zip .
+          cd ..
+          echo "📦 Arquivo ZIP criado"
+
+      - name: Criar Release no GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag_info.outputs.tag }}
+          name: MyDistroLinux ${{ steps.tag_info.outputs.version }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+          files: |
+            distro.sh
+            README.md
+            mydistrolinux-${{ steps.tag_info.outputs.version }}.zip
+            release/install.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  auto-version:
+    name: Auto Incrementar Versão
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Calcular próxima versão
+        id: next_version
+        run: |
+          # Obter última tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "📌 Última tag: $LAST_TAG"
+          
+          # Extrair números da versão
+          VERSION=${LAST_TAG#v}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          
+          # Verificar tipo de commit para decidir incremento
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          
+          if [[ $COMMIT_MSG == *"BREAKING CHANGE"* ]] || [[ $COMMIT_MSG == *"major"* ]]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            TYPE="major"
+          elif [[ $COMMIT_MSG == *"feat"* ]] || [[ $COMMIT_MSG == *"feature"* ]]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+            TYPE="minor"
+          else
+            PATCH=$((PATCH + 1))
+            TYPE="patch"
+          fi
+          
+          NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "type=$TYPE" >> $GITHUB_OUTPUT
+          echo "🎯 Nova versão: $NEW_VERSION (tipo: $TYPE)"
+
+      - name: Criar e enviar tag
+        env:
+          NEW_VERSION: ${{ steps.next_version.outputs.version }}
+          VERSION_TYPE: ${{ steps.next_version.outputs.type }}
+        run: |
+          # Verificar se já existe commits desde última tag
+          if git describe --exact-match HEAD 2>/dev/null; then
+            echo "⏭️  HEAD já está em uma tag, pulando..."
+            exit 0
+          fi
+          
+          # Criar tag anotada
+          git tag -a $NEW_VERSION -m "🔖 Release $NEW_VERSION (auto-$VERSION_TYPE)"
+          git push origin $NEW_VERSION
+          echo "✅ Tag $NEW_VERSION criada e enviada"
+
+  docker-test:
+    name: Testar em Container
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Testar dependências
+        run: |
+          echo "🧪 Testando instalação de dependências..."
+          docker run --rm ubuntu:24.04 bash -c "
+            apt-get update && 
+            apt-get install -y \
+              debootstrap \
+              squashfs-tools \
+              xorriso \
+              isolinux \
+              syslinux-utils \
+              grub-pc-bin \
+              grub-efi-amd64-bin \
+              mtools \
+              zenity && 
+            echo '✅ Todas as dependências instaladas com sucesso'
+          "
+
+  notify:
+    name: Notificar Status
+    runs-on: ubuntu-latest
+    needs: [validate, version-check, create-release]
+    if: always()
+    steps:
+      - name: Resumo do workflow
+        run: |
+          echo "## 📊 Resumo do CI/CD" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch/Tag**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Autor**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Validação**: ${{ needs.validate.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Versão**: ${{ needs.version-check.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.create-release.result }}" != "skipped" ]; then
+            echo "- **Release**: ${{ needs.create-release.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Pipeline concluído!" >> $GITHUB_STEP_SUMMARY

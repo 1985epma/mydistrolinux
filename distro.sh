@@ -226,32 +226,132 @@ EOF_CHROOT
   printf "LABEL=%s\n" "$DISTRO_NAME" | sudo tee "$IMAGE_DIR/casper/label" > /dev/null
   sudo du -sx --block-size=1 "$CHROOT_DIR" | cut -f1 | sudo tee "$IMAGE_DIR/casper/filesystem.size" > /dev/null
 
-  # 3.8 ISOLINUX BIOS
-  STEP 5 "Configurando ISOLINUX (boot BIOS)..."
+  # 3.8 ISOLINUX BIOS CUSTOMIZADO
+  STEP 5 "Configurando ISOLINUX customizado (boot BIOS)..."
   sudo tee "$IMAGE_DIR/isolinux/isolinux.cfg" > /dev/null << EOF_ISO
 UI menu.c32
 PROMPT 0
-MENU TITLE $DISTRO_NAME $DISTRO_VERSION
-TIMEOUT 50
+MENU TITLE $DISTRO_NAME $DISTRO_VERSION - Boot Menu
+TIMEOUT 100
+MENU BACKGROUND isolinux.png
+
+# Cores personalizadas
+MENU COLOR screen       37;40      #80ffffff #00000000 std
+MENU COLOR border       30;44      #40ffffff #00000000 std
+MENU COLOR title        1;36;44    #ff00ffff #00000000 std
+MENU COLOR sel          7;37;40    #e0000000 #20ff8000 all
+MENU COLOR unsel        37;44      #50ffffff #00000000 std
+MENU COLOR help         37;40      #c0ffffff #00000000 std
+MENU COLOR timeout_msg  37;40      #80ffffff #00000000 std
+MENU COLOR timeout      1;37;40    #c0ffffff #00000000 std
+MENU COLOR msg07        37;40      #90ffffff #00000000 std
+MENU COLOR tabmsg       31;40      #90ffff00 #00000000 std
 
 LABEL live
-  menu label ^Iniciar $DISTRO_NAME (Live)
+  menu label ^Iniciar $DISTRO_NAME (Live Mode)
   kernel /casper/vmlinuz
   append initrd=/casper/initrd boot=casper quiet splash ---
+
+LABEL safe
+  menu label ^Modo Seguro
+  kernel /casper/vmlinuz
+  append initrd=/casper/initrd boot=casper nomodeset quiet splash ---
+
+LABEL text
+  menu label ^Modo Texto (Sem Interface Gráfica)
+  kernel /casper/vmlinuz
+  append initrd=/casper/initrd boot=casper text ---
+
+MENU SEPARATOR
+
+LABEL hd
+  menu label ^Boot do Disco Rígido
+  localboot 0x80
 EOF_ISO
 
   sudo cp /usr/lib/ISOLINUX/isolinux.bin "$IMAGE_DIR/isolinux/" || erro "Não encontrei isolinux.bin"
   sudo cp /usr/lib/syslinux/modules/bios/menu.c32 "$IMAGE_DIR/isolinux/" || erro "Não encontrei menu.c32"
 
-  # 3.9 GRUB UEFI
-  STEP 5 "Configurando GRUB (UEFI)..."
+  # 3.9 GRUB UEFI CUSTOMIZADO
+  STEP 5 "Configurando GRUB customizado (UEFI)..."
   sudo tee "$IMAGE_DIR/boot/grub/grub.cfg" > /dev/null << EOF_GRUB
+# Configuração personalizada do GRUB
 set default=0
-set timeout=5
+set timeout=10
 
-menuentry "$DISTRO_NAME $DISTRO_VERSION (Live)" {
+# Cores personalizadas (tema escuro moderno)
+set color_normal=white/black
+set color_highlight=black/white
+
+# Papel de parede e tema
+set menu_color_normal=cyan/black
+set menu_color_highlight=white/cyan
+
+# Título personalizado
+set gfxmode=auto
+insmod all_video
+insmod gfxterm
+terminal_output gfxterm
+
+# Banner ASCII Art
+echo ""
+echo "  ╔════════════════════════════════════════════╗"
+echo "  ║                                            ║"
+echo "  ║         $DISTRO_NAME v$DISTRO_VERSION                    ║"
+echo "  ║                                            ║"
+echo "  ║      Bem-vindo ao Sistema Live             ║"
+echo "  ║                                            ║"
+echo "  ╚════════════════════════════════════════════╝"
+echo ""
+
+menuentry "▶ Iniciar $DISTRO_NAME (Live Mode)" {
+    echo "Iniciando sistema live..."
     linux   /casper/vmlinuz boot=casper quiet splash ---
     initrd  /casper/initrd
+}
+
+menuentry "▶ Iniciar $DISTRO_NAME (Modo Seguro)" {
+    echo "Iniciando em modo seguro..."
+    linux   /casper/vmlinuz boot=casper nomodeset quiet splash ---
+    initrd  /casper/initrd
+}
+
+menuentry "▶ Iniciar $DISTRO_NAME (Sem Interface Gráfica)" {
+    echo "Iniciando modo texto..."
+    linux   /casper/vmlinuz boot=casper text ---
+    initrd  /casper/initrd
+}
+
+menuentry "▶ Testar Memória RAM (Memtest86+)" --class memtest {
+    echo "Carregando teste de memória..."
+    linux16 /boot/memtest86+.bin
+}
+
+submenu "⚙ Opções Avançadas" {
+    menuentry "▶ Boot com drivers proprietários" {
+        linux   /casper/vmlinuz boot=casper modprobe.blacklist=nouveau quiet splash ---
+        initrd  /casper/initrd
+    }
+    
+    menuentry "▶ Boot com ACPI desabilitado" {
+        linux   /casper/vmlinuz boot=casper acpi=off quiet splash ---
+        initrd  /casper/initrd
+    }
+    
+    menuentry "▶ Boot modo debug (verbose)" {
+        linux   /casper/vmlinuz boot=casper debug verbose ---
+        initrd  /casper/initrd
+    }
+}
+
+menuentry "⎌ Reiniciar" --class restart {
+    echo "Reiniciando..."
+    reboot
+}
+
+menuentry "⏻ Desligar" --class shutdown {
+    echo "Desligando..."
+    halt
 }
 EOF_GRUB
 

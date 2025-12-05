@@ -1,0 +1,8 @@
+# Configuração de versionamento semântico
+# Formato: major.minor.patch
+# 
+# major: Mudanças incompatíveis com versões anteriores
+# minor: Novas funcionalidades compatíveis
+# patch: Correções de bugs
+
+CURRENT_VERSION=1.0.0

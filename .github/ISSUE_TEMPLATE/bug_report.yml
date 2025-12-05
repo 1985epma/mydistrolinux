@@ -1,0 +1,71 @@
+name: Bug Report
+description: Reportar um bug ou problema
+title: "[BUG] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug! Preencha as informações abaixo.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição do Bug
+      description: Descreva claramente o problema encontrado
+      placeholder: O que aconteceu?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para Reproduzir
+      description: Como reproduzir o problema?
+      placeholder: |
+        1. Execute o script com '...'
+        2. Escolha a opção '...'
+        3. Veja o erro em '...'
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento Esperado
+      description: O que deveria ter acontecido?
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Sistema Operacional
+      placeholder: "Ex: Ubuntu 24.04, Debian 12"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Versão do Script
+      placeholder: "Ex: v1.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs Relevantes
+      description: Cole os logs de /tmp/*.log se disponíveis
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Informações Adicionais
+      description: Qualquer outra informação relevante
+    validations:
+      required: false
