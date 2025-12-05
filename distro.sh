@@ -113,6 +113,23 @@ deb http://archive.ubuntu.com/ubuntu $UBUNTU_RELEASE-updates main restricted uni
 deb http://archive.ubuntu.com/ubuntu $UBUNTU_RELEASE-security main restricted universe multiverse
 EOT
 
+# Adicionar repositórios de terceiros
+
+# Google Chrome
+wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+
+# Microsoft Edge
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-edge-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge-keyring.gpg] https://packages.microsoft.com/repos/edge stable main" > /etc/apt/sources.list.d/microsoft-edge.list
+
+# Spotify
+curl -sS https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg | gpg --dearmor -o /usr/share/keyrings/spotify-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/spotify-keyring.gpg] http://repository.spotify.com stable non-free" > /etc/apt/sources.list.d/spotify.list
+
+# Steam (repositório multiverse já está habilitado)
+dpkg --add-architecture i386
+
 apt update
 
 # PACOTES BÁSICOS - customize aqui
@@ -138,6 +155,21 @@ DEBIAN_FRONTEND=noninteractive apt install -y \
     zsh \
     vlc \
     gparted
+
+# PACOTES DE TERCEIROS (descomente os que desejar)
+# Google Chrome
+# DEBIAN_FRONTEND=noninteractive apt install -y google-chrome-stable
+
+# Microsoft Edge
+# DEBIAN_FRONTEND=noninteractive apt install -y microsoft-edge-stable
+
+# Spotify
+# DEBIAN_FRONTEND=noninteractive apt install -y spotify-client
+
+# Steam (requer aceitar EULA)
+# echo steam steam/question select "I AGREE" | debconf-set-selections
+# echo steam steam/license note '' | debconf-set-selections
+# DEBIAN_FRONTEND=noninteractive apt install -y steam-installer
 
 # Usuário padrão
 USERNAME="$USERNAME"
