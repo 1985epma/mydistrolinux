@@ -152,12 +152,17 @@ Documento completo detalhando:
 
 ## 📊 Estatísticas
 
-- **Repositórios adicionados:** 15+
-- **Pacotes disponíveis:** 50+
-- **Categorias:** 6 (Kernel/Drivers, Navegadores, Dev Tools, DBs, Multimídia, Ferramentas)
+- **Repositórios adicionados:** 25+
+- **Pacotes APT disponíveis:** 80+
+- **Aplicativos Flatpak:** 2000+ (via Flathub)
+- **Pacotes Homebrew:** 6000+ (formulae)
+- **Categorias:** 10 (Kernel/Drivers, Navegadores, Dev Tools, DBs, Multimídia, Comunicação, Cloud, Kubernetes, Flatpak, Editores)
 - **Linguagens suportadas:** 7 (Java, .NET, JavaScript, Go, Ruby, Python, Rust)
-- **IDEs:** 3+ (VSCode, JetBrains, Vim)
+- **IDEs:** 5+ (VSCode, JetBrains, IntelliJ via Flatpak, GNOME Builder, Neovim)
 - **Bancos de dados:** 4 (PostgreSQL, MySQL, MongoDB, Redis)
+- **Gerenciadores de pacotes:** 4 (APT, Snap, Flatpak, Homebrew)
+- **Provedores Cloud:** 3 (Google Cloud, AWS, Azure)
+- **IaC Tools:** 2 (Terraform, Pulumi)
 
 ---
 
@@ -221,6 +226,127 @@ DEBIAN_FRONTEND=noninteractive apt install -y postgresql
 ---
 
 ## 🆕 Atualização Mais Recente
+
+### 🍺 Homebrew - Gerenciador de Pacotes (Dezembro 2024)
+
+Adicionado suporte ao Homebrew (brew), o popular gerenciador de pacotes:
+
+**Integração:**
+- ✅ **Instalação opcional** - Descomente 4 linhas no script
+- ✅ **Instalado como usuário** - Não requer root
+- ✅ **6000+ pacotes** disponíveis (formulae)
+- ✅ **PATH configurado** - Automático no .bashrc e .zshrc
+
+**Localização:**
+- Homebrew: `/home/linuxbrew/.linuxbrew/`
+- Binários: `/home/linuxbrew/.linuxbrew/bin/`
+
+**Comandos principais:**
+```bash
+brew install <pacote>      # Instalar
+brew update               # Atualizar Homebrew
+brew upgrade              # Atualizar pacotes
+brew list                 # Listar instalados
+brew search <nome>        # Pesquisar
+```
+
+**Pacotes populares:**
+- 🔧 Ferramentas: ripgrep, bat, exa, fd, fzf
+- 💻 Dev: node, python@3.12, go, rust, gcc
+- ☁️ DevOps: k9s, helm, kind
+- 🛠️ Utils: htop, tmux, neofetch
+
+**Vantagens:**
+- ✅ Versões mais recentes que apt
+- ✅ Não interfere no sistema
+- ✅ Fácil de usar
+- ✅ Comunidade ativa
+
+### ☁️ Cloud, DevOps e Infraestrutura (Dezembro 2024)
+
+Adicionados repositórios completos para trabalho com cloud e infraestrutura:
+
+**Provedores Cloud:**
+- ✅ **Google Cloud SDK** - Ferramentas gcloud, gsutil, bq
+- ✅ **AWS CLI v2** - Interface de linha de comando AWS
+- ✅ **Azure CLI** - Ferramentas az para Azure
+
+**Infraestrutura como Código:**
+- ✅ **Terraform** (HashiCorp) - Provisionamento multi-cloud
+- ✅ **Pulumi** - IaC com linguagens de programação
+- ✅ **Packer** - Criação de imagens de máquina
+
+**Kubernetes e Containers:**
+- ✅ **kubectl** - CLI oficial Kubernetes
+- ✅ **Minikube** - Kubernetes local
+- ✅ **Podman** - Alternativa ao Docker sem daemon
+
+**Editores:**
+- ✅ **Neovim** - Editor moderno e extensível
+- ✅ **Find** - Utilitário de busca (já incluído no sistema)
+
+**GPG Keys configuradas:**
+- Google Cloud (oficial)
+- Azure CLI (Microsoft)
+- HashiCorp (Terraform, Packer, Vault)
+- Kubernetes (oficial)
+
+**Comandos disponíveis após instalação:**
+```bash
+gcloud, gsutil, bq           # Google Cloud
+aws, aws-cli                 # AWS
+az                           # Azure
+terraform, packer, vault     # HashiCorp
+kubectl, minikube            # Kubernetes
+pulumi                       # Pulumi
+podman, podman-compose       # Podman
+nvim                         # Neovim
+```
+
+### 📦 Flatpak e Flathub (Dezembro 2024)
+
+Adicionado suporte completo ao Flatpak com repositório Flathub:
+
+**Integração:**
+- ✅ **Flatpak** instalado por padrão
+- ✅ **Flathub** configurado automaticamente
+- ✅ **GNOME Software Plugin** para integração com loja de apps
+- ✅ 2000+ aplicativos disponíveis
+
+**Categorias disponíveis:**
+- 🎨 Design: GIMP, Inkscape, Blender, Krita
+- 📝 Produtividade: LibreOffice, Thunderbird, Obsidian
+- 🎵 Multimídia: VLC, Audacity, Kdenlive, OBS Studio, HandBrake
+- 💬 Comunicação: Telegram, Spotify, Discord, Slack, Zoom
+- 🎮 Gaming: Steam, Lutris, RetroArch
+- 💻 Desenvolvimento: VS Code, IntelliJ IDEA, Postman
+
+**Vantagens:**
+- ✅ Apps sempre atualizados
+- ✅ Isolamento e segurança (sandbox)
+- ✅ Compatibilidade universal
+- ✅ Milhares de aplicativos disponíveis
+
+### 💬 Comunicação e Ferramentas DevOps (Dezembro 2024)
+
+Adicionados repositórios para trabalho remoto e colaboração:
+
+**Comunicação:**
+- ✅ **Microsoft Teams** - Videoconferência e chat corporativo
+- ✅ **Zoom** - Videoconferências e reuniões
+- ✅ **Slack** (via Snap) - Chat corporativo
+- ✅ **Discord** (via Snap) - Comunicação e comunidades
+
+**Ferramentas Git/DevOps:**
+- ✅ **GitHub CLI (gh)** - Linha de comando oficial do GitHub
+- ✅ **GitHub Desktop** - Interface gráfica para GitHub
+- ✅ **GitLab Runner** - CI/CD para GitLab
+
+**GPG Keys configuradas:**
+- Microsoft Teams (Microsoft oficial)
+- Zoom (chave oficial)
+- GitHub CLI (oficial)
+- GitLab Runner (oficial)
 
 ### 🔐 Configuração Fácil do Sudo (Dezembro 2024)
 

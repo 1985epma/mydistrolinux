@@ -200,6 +200,24 @@ O script configura automaticamente os seguintes repositórios para garantir aces
 - **Yarn** (gerenciador de pacotes JavaScript)
 - **PostgreSQL** (repositório oficial PostgreSQL)
 
+#### 💬 Comunicação e Colaboração
+- **Microsoft Teams** (repositório oficial Microsoft)
+- **Zoom** (repositório oficial Zoom)
+
+#### 🔧 Ferramentas Git/DevOps
+- **GitHub CLI** (repositório oficial GitHub)
+- **GitLab Runner** (repositório oficial GitLab)
+
+#### ☁️ Cloud e Infraestrutura
+- **Google Cloud SDK** (repositório oficial Google)
+- **Azure CLI** (repositório oficial Microsoft)
+- **HashiCorp** (Terraform, Packer, Vault)
+- **Kubernetes** (kubectl - repositório oficial)
+
+#### 📦 Flatpak e Flathub
+- **Flatpak** - Gerenciador de pacotes universal (instalado por padrão)
+- **Flathub** - Repositório com milhares de aplicativos (configurado automaticamente)
+
 #### 🎵 Multimídia
 - **Spotify** (repositório oficial)
 - **OBS Studio PPA** - Software de gravação/streaming
@@ -280,8 +298,20 @@ redis-server
 # Docker + Compose
 docker-ce, docker-ce-cli, docker-compose-plugin
 
+# Podman (alternativa Docker)
+podman, podman-compose
+
 # Git atualizado
 git, git-lfs
+
+# GitHub CLI
+gh
+
+# GitHub Desktop
+github-desktop
+
+# GitLab Runner
+gitlab-runner
 
 # Postman (via Snap)
 postman
@@ -291,6 +321,86 @@ dbeaver-ce
 
 # Insomnia (REST client, Snap)
 insomnia
+```
+
+#### ☁️ Cloud e Infraestrutura
+```bash
+# Google Cloud SDK
+google-cloud-cli
+
+# AWS CLI v2
+awscli (instalador)
+
+# Azure CLI
+azure-cli
+
+# Terraform
+terraform
+
+# Pulumi
+pulumi (instalador)
+
+# Kubernetes CLI
+kubectl
+
+# Minikube
+minikube (download)
+```
+
+#### ✏️ Editores
+```bash
+# Neovim
+neovim
+
+# Vim (padrão)
+vim
+
+# VS Code
+code
+```
+
+#### Comunicação e Colaboração
+```bash
+# Microsoft Teams
+teams
+
+# Zoom
+zoom
+
+# Slack (via Snap)
+slack
+
+# Discord (via Snap)
+discord
+```
+
+#### Aplicativos via Flatpak (Flathub)
+```bash
+# Design e Criação
+org.gimp.GIMP              # Editor de imagens
+org.inkscape.Inkscape      # Editor vetorial
+org.blender.Blender        # Modelagem 3D
+
+# Produtividade
+org.libreoffice.LibreOffice  # Suite de escritório
+org.mozilla.Thunderbird      # Cliente de e-mail
+
+# Multimídia
+org.videolan.VLC             # Player de vídeo
+org.audacityteam.Audacity    # Editor de áudio
+org.kde.kdenlive             # Editor de vídeo
+com.obsproject.Studio        # OBS Studio
+
+# Comunicação
+org.telegram.desktop         # Telegram
+com.spotify.Client           # Spotify
+
+# Gaming
+com.valvesoftware.Steam      # Steam
+
+# Como instalar:
+# flatpak install flathub <app-id>
+# Exemplo: flatpak install flathub org.gimp.GIMP
 ```
 
 #### Navegadores
@@ -330,6 +440,87 @@ DEBIAN_FRONTEND=noninteractive apt install -y docker-ce
 - **Desktop**: xorg, lightdm, xfce4, xfce4-goodies
 - **Apps**: firefox, vlc, gparted, zsh
 - **Boot**: casper, grub-pc-bin, grub-efi-amd64-bin
+- **Flatpak**: flatpak, gnome-software-plugin-flatpak (com Flathub configurado)
+- **Build tools**: build-essential, curl, wget, git (para Homebrew)
+
+### 🍺 Homebrew (Opcional)
+
+O Homebrew é um gerenciador de pacotes popular originalmente do macOS, disponível para Linux.
+
+**Como ativar:**
+1. Abra `distro.sh`
+2. Localize a seção "HOMEBREW"
+3. Descomente as 4 linhas de instalação
+
+**Vantagens:**
+- ✅ Acesso a milhares de pacotes (formulae)
+- ✅ Versões mais recentes de software
+- ✅ Isolamento do sistema
+- ✅ Gerenciamento simples (`brew install`, `brew update`)
+
+**Após instalação, use:**
+```bash
+# Pesquisar pacotes
+brew search <nome>
+
+# Instalar pacote
+brew install <pacote>
+
+# Atualizar Homebrew
+brew update
+
+# Atualizar pacotes instalados
+brew upgrade
+
+# Listar pacotes instalados
+brew list
+
+# Remover pacote
+brew uninstall <pacote>
+```
+
+**Exemplos de uso:**
+```bash
+brew install gcc           # Compilador GCC mais recente
+brew install cmake         # CMake
+brew install node          # Node.js (alternativa ao apt)
+brew install python@3.12   # Python 3.12
+brew install ripgrep       # Ferramenta de busca rápida
+brew install bat           # Cat melhorado
+brew install exa           # ls melhorado
+```
+
+### Usando Flatpak/Flathub
+
+O Flatpak vem instalado e configurado por padrão com acesso ao Flathub. Para instalar aplicativos:
+
+```bash
+# Pesquisar aplicativos
+flatpak search <nome>
+
+# Instalar aplicativo
+flatpak install flathub <app-id>
+
+# Exemplos:
+flatpak install flathub org.gimp.GIMP
+flatpak install flathub com.spotify.Client
+flatpak install flathub org.telegram.desktop
+
+# Listar aplicativos instalados
+flatpak list
+
+# Atualizar todos os aplicativos
+flatpak update
+
+# Remover aplicativo
+flatpak uninstall <app-id>
+```
+
+**Vantagens do Flatpak:**
+- ✅ Aplicativos sempre atualizados
+- ✅ Isolamento e segurança (sandbox)
+- ✅ Milhares de apps disponíveis no Flathub
+- ✅ Compatibilidade entre distribuições
 
 ## 🎨 Personalização
 

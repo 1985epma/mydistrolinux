@@ -90,6 +90,140 @@ Todos os repositórios abaixo são configurados automaticamente pelo script `dis
 
 ---
 
+### 💬 Comunicação e Colaboração
+
+| Repositório | Descrição | Instalação |
+|-------------|-----------|-----------|
+| **Microsoft Teams** | Videoconferência e chat | `teams` |
+| **Zoom** | Videoconferência | `zoom` |
+| **Slack** | Chat corporativo | Snap: `slack` |
+| **Discord** | Comunicação e comunidades | Snap: `discord` |
+
+**GPG Keys:**
+- Microsoft Teams: Mesma chave Microsoft oficial
+- Zoom: `https://zoom.us/linux/download/pubkey`
+
+---
+
+### 🔧 Ferramentas Git e DevOps
+
+| Repositório | Descrição | Pacotes |
+|-------------|-----------|---------|
+| **GitHub CLI** | Linha de comando GitHub | `gh` |
+| **GitHub Desktop** | Interface gráfica GitHub | `github-desktop` (download direto) |
+| **GitLab Runner** | CI/CD GitLab | `gitlab-runner` |
+
+**GPG Keys:**
+- GitHub CLI: `https://cli.github.com/packages/githubcli-archive-keyring.gpg`
+- GitLab Runner: `https://packages.gitlab.com/runner/gitlab-runner/gpgkey`
+
+**Comandos úteis:**
+```bash
+# GitHub CLI
+gh auth login        # Autenticar no GitHub
+gh repo clone        # Clonar repositório
+gh pr create         # Criar pull request
+
+# GitLab Runner
+gitlab-runner register   # Registrar runner
+gitlab-runner run        # Executar runner
+```
+
+---
+
+### ☁️ Cloud e Infraestrutura como Código
+
+| Repositório | Descrição | Pacotes |
+|-------------|-----------|---------|
+| **Google Cloud SDK** | Ferramentas GCP | `google-cloud-cli`, `gke-gcloud-auth-plugin` |
+| **Azure CLI** | Ferramentas Azure | `azure-cli` |
+| **HashiCorp** | Terraform, Packer, Vault | `terraform`, `packer`, `vault` |
+| **Kubernetes** | Orquestração de containers | `kubectl` |
+| **AWS CLI** | Ferramentas AWS | Download direto (v2) |
+| **Pulumi** | IaC multi-cloud | Instalador oficial |
+
+**GPG Keys:**
+- Google Cloud: `https://packages.cloud.google.com/apt/doc/apt-key.gpg`
+- Azure CLI: Microsoft oficial
+- HashiCorp: `https://apt.releases.hashicorp.com/gpg`
+- Kubernetes: `https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key`
+
+**Comandos úteis:**
+```bash
+# Google Cloud
+gcloud init                    # Configurar credenciais
+gcloud compute instances list  # Listar VMs
+
+# Azure
+az login                       # Autenticar
+az vm list                     # Listar VMs
+
+# AWS CLI
+aws configure                  # Configurar credenciais
+aws s3 ls                      # Listar buckets
+
+# Terraform
+terraform init                 # Inicializar projeto
+terraform plan                 # Planejar mudanças
+terraform apply                # Aplicar infraestrutura
+
+# Kubectl
+kubectl get pods               # Listar pods
+kubectl apply -f deploy.yaml   # Aplicar manifesto
+
+# Minikube
+minikube start                 # Iniciar cluster local
+minikube dashboard             # Abrir dashboard
+```
+
+**Ferramentas Adicionais:**
+- **Podman** - Alternativa ao Docker sem daemon
+- **Minikube** - Kubernetes local para desenvolvimento
+- **Neovim** - Editor de texto moderno e extensível
+
+---
+
+### 📦 Flatpak e Flathub
+
+| Componente | Descrição | Status |
+|------------|-----------|--------|
+| **Flatpak** | Gerenciador de pacotes universal | Instalado por padrão |
+| **Flathub** | Repositório com 2000+ apps | Configurado automaticamente |
+| **GNOME Software Plugin** | Integração com loja de apps | Instalado |
+
+**Repositório Flathub:** `https://flathub.org/repo/flathub.flatpakrepo`
+
+**Categorias de Apps Disponíveis:**
+- 🎨 Design e Criação (GIMP, Inkscape, Blender)
+- 📝 Produtividade (LibreOffice, Thunderbird)
+- 🎵 Multimídia (VLC, Audacity, Kdenlive, OBS)
+- 💬 Comunicação (Telegram, Spotify, Discord)
+- 🎮 Gaming (Steam, Lutris, RetroArch)
+- 💻 Desenvolvimento (VS Code, Android Studio, IDEs)
+
+**Comandos úteis:**
+```bash
+# Pesquisar
+flatpak search gimp
+
+# Instalar
+flatpak install flathub org.gimp.GIMP
+
+# Listar instalados
+flatpak list
+
+# Atualizar todos
+flatpak update
+
+# Remover
+flatpak uninstall org.gimp.GIMP
+
+# Ver informações
+flatpak info org.gimp.GIMP
+```
+
+---
+
 ## 📦 Pacotes Disponíveis para Instalação
 
 Todos os pacotes abaixo podem ser instalados editando o arquivo `distro.sh` e descomentando as linhas correspondentes.
@@ -195,9 +329,91 @@ docker-compose-plugin
 # Docker Buildx (plugin)
 docker-buildx-plugin
 
+# Podman (alternativa Docker)
+podman
+podman-compose
+
 # Git (versão mais recente)
 git
 git-lfs
+
+# GitHub CLI
+gh
+
+# GitHub Desktop
+github-desktop
+
+# GitLab Runner
+gitlab-runner
+```
+
+### ☁️ Cloud e Infraestrutura
+
+```bash
+# Google Cloud SDK
+google-cloud-cli
+google-cloud-cli-gke-gcloud-auth-plugin
+
+# Azure CLI
+azure-cli
+
+# AWS CLI (via instalador)
+# Download: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+
+# Terraform
+terraform
+
+# Pulumi (via instalador)
+# curl -fsSL https://get.pulumi.com | sh
+
+# Kubernetes CLI
+kubectl
+
+# Minikube (via download)
+# https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+```
+
+### ✏️ Editores e Ferramentas
+
+```bash
+# Neovim (moderno e extensível)
+neovim
+
+# Vim (clássico)
+vim
+
+# Visual Studio Code
+code
+```
+
+# Git (versão mais recente)
+git
+git-lfs
+
+# GitHub CLI
+gh
+
+# GitHub Desktop
+github-desktop
+
+# GitLab Runner
+gitlab-runner
+```
+
+### 💬 Comunicação e Colaboração
+
+```bash
+# Microsoft Teams
+teams
+
+# Zoom
+zoom
+
+# Slack (via Snap)
+slack
+
+# Discord (via Snap)
+discord
 ```
 
 ### 🌐 Navegadores
@@ -227,6 +443,54 @@ steam-installer
 
 # VLC (incluído por padrão)
 vlc
+```
+
+### 📦 Aplicativos via Flatpak (Flathub)
+
+```bash
+# DESIGN E CRIAÇÃO
+org.gimp.GIMP                    # Editor de imagens profissional
+org.inkscape.Inkscape            # Editor gráfico vetorial
+org.blender.Blender              # Modelagem 3D e animação
+org.kde.krita                    # Pintura digital
+com.github.maoschanz.drawing     # Desenho simples
+
+# PRODUTIVIDADE
+org.libreoffice.LibreOffice      # Suite de escritório completa
+org.mozilla.Thunderbird          # Cliente de e-mail
+com.jgraph.drawio.desktop        # Diagramas e fluxogramas
+md.obsidian.Obsidian             # Notas em Markdown
+
+# MULTIMÍDIA
+org.videolan.VLC                 # Player de vídeo universal
+org.audacityteam.Audacity        # Editor de áudio
+org.kde.kdenlive                 # Editor de vídeo profissional
+com.obsproject.Studio            # OBS Studio (streaming)
+fr.handbrake.ghb                 # Conversor de vídeo
+org.shotcut.Shotcut              # Editor de vídeo alternativo
+
+# COMUNICAÇÃO
+org.telegram.desktop             # Telegram messenger
+com.spotify.Client               # Spotify music
+com.discordapp.Discord           # Discord
+com.slack.Slack                  # Slack
+us.zoom.Zoom                     # Zoom conferências
+
+# GAMING
+com.valvesoftware.Steam          # Steam platform
+net.lutris.Lutris                # Gaming platform Linux
+org.libretro.RetroArch           # Emuladores retro
+
+# DESENVOLVIMENTO
+com.visualstudio.code            # VS Code (alternativa)
+com.jetbrains.IntelliJ-IDEA-Community  # IntelliJ IDEA
+org.gnome.Builder                # GNOME Builder IDE
+com.getpostman.Postman           # API testing
+
+# UTILIDADES
+com.mattjakeman.ExtensionManager # Gerenciar extensões GNOME
+org.gnome.Calculator             # Calculadora
+org.gnome.FileRoller             # Gerenciador de arquivos compactados
 ```
 
 ### 📊 Ferramentas de Produtividade (via Snap)
@@ -332,7 +596,83 @@ sudo apt update
 
 ---
 
-## ⚙️ Configurações Avançadas
+### 🍺 Homebrew (Gerenciador de Pacotes)
+
+| Componente | Descrição | Status |
+|------------|-----------|--------|
+| **Homebrew** | Gerenciador de pacotes universal | Instalação opcional |
+| **Formulae** | 6000+ pacotes disponíveis | Acesso após instalação |
+| **Casks** | Apps GUI para Linux | Suporte limitado no Linux |
+
+**Site oficial:** `https://brew.sh`
+
+**Instalação:**
+O Homebrew é instalado como usuário (não root) e fica em `/home/linuxbrew/.linuxbrew/`
+
+**Comandos úteis:**
+```bash
+# Pesquisar pacotes
+brew search <nome>
+
+# Informações sobre pacote
+brew info <pacote>
+
+# Instalar
+brew install <pacote>
+
+# Atualizar Homebrew
+brew update
+
+# Atualizar pacotes
+brew upgrade
+
+# Listar instalados
+brew list
+
+# Remover pacote
+brew uninstall <pacote>
+
+# Limpar cache
+brew cleanup
+```
+
+**Pacotes populares via Homebrew:**
+```bash
+# Ferramentas modernas
+brew install ripgrep       # Busca rápida (rg)
+brew install bat           # Cat com syntax highlight
+brew install exa           # ls melhorado
+brew install fd            # find melhorado
+brew install fzf           # Fuzzy finder
+
+# Desenvolvimento
+brew install node          # Node.js
+brew install python@3.12   # Python
+brew install go            # Golang
+brew install rust          # Rust
+brew install gcc           # GCC
+
+# DevOps
+brew install k9s           # Kubernetes TUI
+brew install helm          # Kubernetes package manager
+brew install kind          # Kubernetes in Docker
+
+# Utilitários
+brew install htop          # Monitor de processos
+brew install tmux          # Terminal multiplexer
+brew install neofetch      # System info
+```
+
+**Vantagens do Homebrew:**
+- ✅ Versões mais recentes que apt
+- ✅ Instalação sem sudo
+- ✅ Isolamento do sistema
+- ✅ Fácil atualização de tudo
+- ✅ Comunidade ativa
+
+---
+
+### ⚙️ Configurações Avançadas
 
 ### Sudo sem Senha (Padrão)
 

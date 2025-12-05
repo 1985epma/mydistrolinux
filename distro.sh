@@ -200,6 +200,29 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gp
 curl -fsSL https://packages.gitlab.com/runner/gitlab-runner/gpgkey | gpg --dearmor -o /usr/share/keyrings/gitlab-runner.gpg
 echo "deb [signed-by=/usr/share/keyrings/gitlab-runner.gpg] https://packages.gitlab.com/runner/gitlab-runner/ubuntu/ $UBUNTU_RELEASE main" > /etc/apt/sources.list.d/gitlab-runner.list
 
+# ===== FERRAMENTAS CLOUD E DEVOPS =====
+
+# Google Cloud SDK
+curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list
+
+# Azure CLI
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/azure-cli.gpg
+echo "deb [signed-by=/usr/share/keyrings/azure-cli.gpg] https://packages.microsoft.com/repos/azure-cli/ $UBUNTU_RELEASE main" > /etc/apt/sources.list.d/azure-cli.list
+
+# HashiCorp (Terraform, Packer, Vault)
+curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $UBUNTU_RELEASE main" > /etc/apt/sources.list.d/hashicorp.list
+
+# Kubernetes (kubectl)
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" > /etc/apt/sources.list.d/kubernetes.list
+
+# ===== FLATPAK E FLATHUB =====
+
+# Flatpak (gerenciador de pacotes universal)
+# Será instalado nos pacotes básicos
+
 # Steam (repositório multiverse já está habilitado)
 dpkg --add-architecture i386
 
@@ -233,7 +256,16 @@ DEBIAN_FRONTEND=noninteractive apt install -y \
     apt-transport-https \
     ca-certificates \
     gnupg \
-    lsb-release
+    lsb-release \
+    flatpak \
+    gnome-software-plugin-flatpak
+
+# Adicionar repositório Flathub
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+# ===== HOMEBREW (GERENCIADOR DE PACOTES) =====
+# Homebrew será instalado como usuário, não root
+# A instalação será feita depois da criação do usuário
 
 # DRIVERS DE HARDWARE (descomente conforme necessário)
 # NVIDIA Drivers (detecta automaticamente a GPU)
@@ -323,7 +355,63 @@ DEBIAN_FRONTEND=noninteractive apt install -y \
 # echo steam steam/license note '' | debconf-set-selections
 # DEBIAN_FRONTEND=noninteractive apt install -y steam-installer
 
-# FERRAMENTAS EXTRAS
+# COMUNICAÇÃO E COLABORAÇÃO
+# Microsoft Teams
+# DEBIAN_FRONTEND=noninteractive apt install -y teams
+
+# Zoom
+# DEBIAN_FRONTEND=noninteractive apt install -y zoom
+
+# Slack (via Snap - alternativa)
+# snap install slack --classic
+
+# Discord (via Snap)
+# snap install discord
+
+# FERRAMENTAS GIT E DEVOPS
+# GitHub CLI (linha de comando)
+# DEBIAN_FRONTEND=noninteractive apt install -y gh
+
+# GitHub Desktop (via download direto ou Snap)
+# wget -O /tmp/github-desktop.deb https://github.com/shiftkey/desktop/releases/download/release-3.3.6-linux1/GitHubDesktop-linux-amd64-3.3.6-linux1.deb
+# DEBIAN_FRONTEND=noninteractive apt install -y /tmp/github-desktop.deb
+
+# GitLab Runner (para CI/CD)
+# DEBIAN_FRONTEND=noninteractive apt install -y gitlab-runner
+
+# FERRAMENTAS CLOUD E INFRAESTRUTURA
+# Google Cloud SDK (gcloud)
+# DEBIAN_FRONTEND=noninteractive apt install -y google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin
+
+# AWS CLI v2 (via download direto - não tem PPA oficial)
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+# unzip -q /tmp/awscliv2.zip -d /tmp/
+# /tmp/aws/install
+
+# Azure CLI
+# DEBIAN_FRONTEND=noninteractive apt install -y azure-cli
+
+# Terraform (HashiCorp)
+# DEBIAN_FRONTEND=noninteractive apt install -y terraform
+
+# Pulumi (via script de instalação)
+# curl -fsSL https://get.pulumi.com | sh
+
+# Kubernetes CLI (kubectl)
+# DEBIAN_FRONTEND=noninteractive apt install -y kubectl
+
+# Minikube (via download direto)
+# curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+# install minikube-linux-amd64 /usr/local/bin/minikube
+
+# Podman (alternativa ao Docker)
+# DEBIAN_FRONTEND=noninteractive apt install -y podman podman-compose
+
+# EDITORES E FERRAMENTAS
+# Neovim (versão mais recente)
+# DEBIAN_FRONTEND=noninteractive apt install -y neovim
+
+# FERRAMENTAS EXTRAS (Snap)
 # Postman (API testing)
 # snap install postman
 
@@ -332,6 +420,46 @@ DEBIAN_FRONTEND=noninteractive apt install -y \
 
 # Insomnia (REST client)
 # snap install insomnia
+
+# APLICATIVOS VIA FLATPAK (FLATHUB)
+# Flatpak já está instalado e Flathub configurado!
+# Para instalar aplicativos, descomente as linhas abaixo:
+
+# GIMP (editor de imagens)
+# flatpak install -y flathub org.gimp.GIMP
+
+# Inkscape (editor vetorial)
+# flatpak install -y flathub org.inkscape.Inkscape
+
+# Blender (modelagem 3D)
+# flatpak install -y flathub org.blender.Blender
+
+# LibreOffice (suite de escritório)
+# flatpak install -y flathub org.libreoffice.LibreOffice
+
+# Thunderbird (e-mail)
+# flatpak install -y flathub org.mozilla.Thunderbird
+
+# VLC (já no apt, mas disponível no Flatpak também)
+# flatpak install -y flathub org.videolan.VLC
+
+# Telegram (mensageiro)
+# flatpak install -y flathub org.telegram.desktop
+
+# Spotify (alternativa ao apt)
+# flatpak install -y flathub com.spotify.Client
+
+# Steam (alternativa ao apt)
+# flatpak install -y flathub com.valvesoftware.Steam
+
+# OBS Studio (alternativa ao apt)
+# flatpak install -y flathub com.obsproject.Studio
+
+# Audacity (editor de áudio)
+# flatpak install -y flathub org.audacityteam.Audacity
+
+# Kdenlive (editor de vídeo)
+# flatpak install -y flathub org.kde.kdenlive
 
 # ==========================================
 # CONFIGURAÇÃO DE USUÁRIO E SUDO
@@ -367,6 +495,23 @@ echo "\$USERNAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/\$USERNAME
 
 # Garantir permissões corretas no arquivo sudoers
 chmod 0440 /etc/sudoers.d/\$USERNAME
+
+# ==========================================
+# HOMEBREW (GERENCIADOR DE PACOTES)
+# ==========================================
+
+# Instalar Homebrew como usuário (não root)
+# Descomente as linhas abaixo para instalar Homebrew
+
+# Instalar dependências do Homebrew
+# DEBIAN_FRONTEND=noninteractive apt install -y build-essential procps curl file git
+
+# Instalar Homebrew como o usuário criado
+# su - \$USERNAME -c 'NONINTERACTIVE=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+
+# Adicionar Homebrew ao PATH do usuário
+# su - \$USERNAME -c 'echo "eval \"\\\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" >> /home/\$USERNAME/.bashrc'
+# su - \$USERNAME -c 'echo "eval \"\\\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" >> /home/\$USERNAME/.zshrc'
 
 # Autologin no TTY1 (pode remover se não quiser)
 mkdir -p /etc/systemd/system/getty@tty1.service.d
